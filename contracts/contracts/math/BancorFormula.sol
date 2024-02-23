@@ -30,7 +30,7 @@ contract BancorFormula is Power {
         uint256 _supply,
         uint256 _reserveBalance,
         uint32 _reserveRatio,
-        uint256 _depositAmount) public view returns (uint256)
+        uint256 _depositAmount) internal view returns (uint256)
     {
         // validate input
         require(_supply > 0 && _reserveBalance > 0 && _reserveRatio > 0 && _reserveRatio <= MAX_RESERVE_RATIO, "Invalid inputs.");
@@ -73,7 +73,7 @@ contract BancorFormula is Power {
         uint256 _supply,
         uint256 _reserveBalance,
         uint32 _reserveRatio,
-        uint256 _sellAmount) public view returns (uint256)
+        uint256 _sellAmount) internal view returns (uint256)
     {
         // validate input
         require(_supply > 0 && _reserveBalance > 0 && _reserveRatio > 0 && _reserveRatio <= MAX_RESERVE_RATIO && _sellAmount <= _supply, "Invalid inputs.");

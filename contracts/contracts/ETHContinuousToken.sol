@@ -29,10 +29,10 @@ contract ETHContinuousToken is ContinuousToken {
     function burn(uint _amount) public {
         uint refundAmount = _continuousBurn(_amount);
         reserve = reserve - refundAmount;
-        payable(msg.sender).transfer(refundAmount); // Приведение msg.sender к типу payable
+        payable(msg.sender).transfer(refundAmount);
     }
 
-    function reserveBalance() public override view returns (uint) {
+    function getReserveBalance() public override view returns (uint) {
         return reserve;
     }
 }

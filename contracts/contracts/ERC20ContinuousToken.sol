@@ -27,7 +27,7 @@ contract ERC20ContinuousToken is ContinuousToken {
         require(reserveToken.transfer(msg.sender, returnAmount), "burn() ERC20.transfer failed.");
     }
 
-    function reserveBalance() public override view returns (uint) {
+    function getReserveBalance() public override view returns (uint) {
         return reserveToken.balanceOf(address(this));
     }
 }

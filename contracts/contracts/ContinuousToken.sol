@@ -21,8 +21,8 @@ abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
         _mint(msg.sender, _initialSupply);
     }
 
-    function continuousSupply() public override view returns (uint) {
-        return totalSupply(); // Continuous Token total supply
+    function getContinuousSupply() public override view returns (uint) {
+        return totalSupply();
     }
 
     function _continuousMint(uint _deposit) internal returns (uint) {
