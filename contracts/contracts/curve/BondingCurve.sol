@@ -5,9 +5,16 @@ pragma solidity ^0.8.20;
 import "../math/BancorFormula.sol";
 import "../interfaces/IBondingCurve.sol";
 
+/**
+* @title BondingCurve
+* @dev A bonding curve contract based on the Bancor Formula
+*/
 abstract contract BondingCurve is BancorFormula, IBondingCurve {
     uint32 public reserveRatio;
 
+    /**
+    * @param _reserveRatio The reserve ratio of the bonding curve. [1; 1000000]
+    */
     constructor(uint32 _reserveRatio) {
         reserveRatio = _reserveRatio;
     }
