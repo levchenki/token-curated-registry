@@ -20,10 +20,16 @@ abstract contract BondingCurve is BancorFormula, IBondingCurve {
     }
 
     function getContinuousMintReward(uint _reserveTokenAmount) public view returns (uint) {
+        if (getReserveBalance() <= 0) {
+            return 0;
+        }
         return calculatePurchaseReturn(getContinuousSupply(), getReserveBalance(), reserveRatio, _reserveTokenAmount);
     }
 
     function getContinuousBurnRefund(uint _continuousTokenAmount) public view returns (uint) {
+        if (getReserveBalance() <= 0) {
+            return 0;
+        }
         return calculateSaleReturn(getContinuousSupply(), getReserveBalance(), reserveRatio, _continuousTokenAmount);
     }
 
