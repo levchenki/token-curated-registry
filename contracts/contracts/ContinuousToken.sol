@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 * @dev ContinuousToken is an ERC20 token with a bonding curve.
 */
 abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
+    uint256 internal reserve;
     uint8 internal constant DECIMALS = 18;
 
     event Minted(address sender, uint amount, uint deposit);
@@ -21,6 +22,7 @@ abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
     * @param _initialSupply Initial supply of the continuous token.
     * @param _reserveRatio The reserve ratio of the bonding curve.
     * @param _initialOwner The address to receive all continuous tokens on contract creation.
+    * @param _reserve The initial balance of the reserve tokens.
     * @dev Initializes the bonding curve and sets the initial supply of the token.
     */
     constructor(
@@ -28,8 +30,10 @@ abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
         string memory _symbol,
         uint _initialSupply,
         uint32 _reserveRatio,
-        address _initialOwner
+        address _initialOwner,
+        uint256 _reserve
     ) ERC20(_name, _symbol) BondingCurve(_reserveRatio) Ownable(_initialOwner) {
+        reserve = _reserve;
         _mint(msg.sender, _initialSupply);
     }
 
@@ -45,6 +49,13 @@ abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
     }
 
     /**
+    * @dev Returns the total reserve balance.
+    */
+    function getReserveBalance() public override view returns (uint) {
+        return reserve;
+    }
+
+    /**
     * @param _deposit Amount of tokens to deposit.
     * @dev Mints new tokens in exchange for deposit.
     */
@@ -54,6 +65,7 @@ abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
         uint rewardAmount = getContinuousMintReward(_deposit);
         _mint(msg.sender, rewardAmount);
         emit Minted(msg.sender, rewardAmount, _deposit);
+        reserve = reserve + _deposit;
         return rewardAmount;
     }
 
@@ -68,6 +80,7 @@ abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
         uint refundAmount = getContinuousBurnRefund(_amount);
         _burn(msg.sender, _amount);
         emit Burned(msg.sender, _amount, refundAmount);
+        reserve = reserve - refundAmount;
         return refundAmount;
     }
 }

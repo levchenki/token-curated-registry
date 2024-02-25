@@ -8,7 +8,6 @@ import "./ContinuousToken.sol";
 * @dev ETHContinuousToken is a ContinuousToken with ether as the reserve currency.
 */
 contract ETHContinuousToken is ContinuousToken {
-    uint256 internal reserve;
 
     /**
     * @param _name Name of the token.
@@ -24,8 +23,8 @@ contract ETHContinuousToken is ContinuousToken {
         uint _initialSupply,
         uint32 _reserveRatio,
         address _initialOwner
-    ) payable ContinuousToken(_name, _symbol, _initialSupply, _reserveRatio, _initialOwner) {
-        reserve = msg.value;
+    ) payable ContinuousToken(_name, _symbol, _initialSupply, _reserveRatio, _initialOwner, msg.value) {
+
     }
 
     /**
@@ -41,7 +40,6 @@ contract ETHContinuousToken is ContinuousToken {
     function mint() public payable {
         uint purchaseAmount = msg.value;
         _continuousMint(purchaseAmount);
-        reserve = reserve + purchaseAmount;
     }
 
     /**
@@ -50,14 +48,6 @@ contract ETHContinuousToken is ContinuousToken {
     */
     function burn(uint _amount) public {
         uint refundAmount = _continuousBurn(_amount);
-        reserve = reserve - refundAmount;
         payable(msg.sender).transfer(refundAmount);
-    }
-
-    /**
-    * @dev Returns the total reserve balance.
-    */
-    function getReserveBalance() public override view returns (uint) {
-        return reserve;
     }
 }
