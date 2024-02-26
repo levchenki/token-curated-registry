@@ -15,6 +15,7 @@ contract ETHContinuousToken is ContinuousToken {
     * @param _initialSupply Initial supply of the token.
     * @param _reserveRatio The reserve ratio of the bonding curve.
     * @param _initialOwner The address to receive all tokens on contract creation.
+    * @param msg.value The initial reserve balance.
     * @dev Sets the initial reserve balance and creates the token with the initial supply.
     */
     constructor(
