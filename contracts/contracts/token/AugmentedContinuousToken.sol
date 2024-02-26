@@ -69,10 +69,16 @@ contract AugmentedContinuousToken is ContinuousToken {
     function distribute() public onlyOwner onlyAccumulationPeriod {
         require(block.timestamp >= accumulationDateEnd, "Accumulation duration has not ended yet");
         require(reserve > 0, "Reserve must be greater than 0");
+        uint256 distributed = 0;
         for (uint256 i = 0; i < depositors.length; i++) {
             uint256 depositAmount = deposits[depositors[i]];
-            uint256 tokens = depositAmount * reserve / totalSupply();
+            uint256 tokens = depositAmount * totalSupply() / reserve;
+            distributed += tokens;
             transfer(depositors[i], tokens);
+        }
+        if (distributed < totalSupply()) {
+            uint256 remaining = totalSupply() - distributed;
+            transfer(owner(), remaining);
         }
         isActive = true;
     }

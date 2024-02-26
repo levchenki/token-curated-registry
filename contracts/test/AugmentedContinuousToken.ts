@@ -4,7 +4,7 @@ import {expect} from "chai";
 
 const initialName = 'AugmentedContinuousTokenName';
 const initialSymbol = 'CT';
-const initialTokenSupply = 1_000n * BigInt(1e18)
+const initialTokenSupply = 100_000_000n * BigInt(1e18)
 const initialReserveRatio = 900_000; // from 1 to 1_000_000
 
 const initialAccumulationDuration = 5n;
@@ -12,6 +12,33 @@ const initialAccumulationDuration = 5n;
 function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+function stringify(bigIntValue: bigint): string {
+    const decimalPlaces = 18;
+    let str = bigIntValue.toString();
+    if (str.length > decimalPlaces) {
+        const index = str.length - decimalPlaces;
+        str = str.slice(0, index) + '.' + str.slice(index);
+    } else {
+        str = '0.' + str.padStart(decimalPlaces, '0');
+    }
+    return parseFloat(str).toLocaleString('fullwide', {useGrouping: false});
+}
+
+function generateRandomBigInt(minDecimals: number, maxDecimals: number): bigint {
+    // Определяем минимальное и максимальное количество десятичных знаков
+    const decimalPlaces = Math.floor(Math.random() * (maxDecimals - minDecimals + 1)) + minDecimals;
+
+    // Максимальное значение для заданного количества десятичных знаков
+    const max = BigInt('1' + '0'.repeat(decimalPlaces));
+
+    // Генерация случайного числа в заданном диапазоне десятичных знаков
+    return BigInt(Math.floor(Math.random() * Number(max)));
+}
+
+// Пример использования для генерации числа от 18 до 24 десятичных знаков
+const randomBigInt = generateRandomBigInt(18, 24);
+console.log(randomBigInt.toString());
 
 
 describe('AugmentedContinuousToken', () => {
@@ -130,6 +157,132 @@ describe('AugmentedContinuousToken', () => {
             expect(depositAfter).to.equal(firstDepositAmount + secondDepositAmount)
         });
 
+    });
+
+    describe('Deposits distribution', () => {
+        it('should be the correct number of reserve tokens after distribution', async () => {
+            const {token, owner, first} = await deployTokenFixture();
+            const depositAmount = 100n * BigInt(1e18);
+            await token.write.deposit({value: depositAmount, account: first.account.address});
+
+            await sleep(Number(initialAccumulationDuration) * 1000)
+            await token.write.distribute({account: owner.account.address})
+
+            const reserveBalance = await token.read.getReserveBalance()
+            expect(reserveBalance).to.equal(depositAmount)
+        });
+
+
+        it('should be the correct balance of tokens after distribution for one depositor', async () => {
+            const {token, owner, first} = await deployTokenFixture();
+            const depositAmount = 100n * BigInt(1e18);
+            await token.write.deposit({value: depositAmount, account: first.account.address});
+
+            await sleep(Number(initialAccumulationDuration) * 1000)
+            await token.write.distribute({account: owner.account.address})
+
+            const clientBalance = await token.read.balanceOf([first.account.address])
+            expect(clientBalance).to.equal(initialTokenSupply)
+        });
+
+        it('should be the correct balance of tokens after distribution for two depositors', async () => {
+            const {token, owner, first, second} = await deployTokenFixture();
+            const firstDepositAmount = 100n * BigInt(1e18);
+            await token.write.deposit({value: firstDepositAmount, account: first.account.address});
+
+            const secondDepositAmount = 200n * BigInt(1e18);
+            await token.write.deposit({value: secondDepositAmount, account: second.account.address});
+
+            await sleep(Number(initialAccumulationDuration) * 1000)
+            await token.write.distribute({account: owner.account.address})
+
+            const reserveBalance = await token.read.getReserveBalance()
+            const firstClientBalance = await token.read.balanceOf([first.account.address])
+            const secondClientBalance = await token.read.balanceOf([second.account.address])
+
+            expect(reserveBalance).to.equal(firstDepositAmount + secondDepositAmount)
+            const firstExpected = (firstDepositAmount * initialTokenSupply) / reserveBalance
+            const secondExpected = (secondDepositAmount * initialTokenSupply) / reserveBalance
+            expect(firstClientBalance).to.equal(firstExpected)
+            expect(secondClientBalance).to.equal(secondExpected)
+
+            const ownerBalance = await token.read.balanceOf([owner.account.address])
+
+            expect(firstClientBalance + secondClientBalance + ownerBalance).to.equal(initialTokenSupply)
+        });
+        it('should be the correct balance of tokens after distribution for three depositors', async () => {
+            const {
+                token,
+                owner,
+                first,
+                second,
+                third
+            } = await deployTokenFixture();
+            const firstDepositAmount = 213n * BigInt(1e18);
+            await token.write.deposit({value: firstDepositAmount, account: first.account.address});
+
+            const secondDepositAmount = 742n * BigInt(1e18);
+            await token.write.deposit({value: secondDepositAmount, account: second.account.address});
+
+            const thirdDepositAmount = 1213n * BigInt(1e18);
+            await token.write.deposit({value: thirdDepositAmount, account: third.account.address});
+
+            await sleep(Number(initialAccumulationDuration) * 1000)
+            await token.write.distribute({account: owner.account.address})
+
+            const reserveBalance = await token.read.getReserveBalance()
+            const firstClientBalance = await token.read.balanceOf([first.account.address])
+            const secondClientBalance = await token.read.balanceOf([second.account.address])
+            const thirdClientBalance = await token.read.balanceOf([third.account.address])
+
+            expect(reserveBalance).to.equal(firstDepositAmount + secondDepositAmount + thirdDepositAmount)
+            const firstExpected = (firstDepositAmount * initialTokenSupply) / reserveBalance
+            const secondExpected = (secondDepositAmount * initialTokenSupply) / reserveBalance
+            const thirdExpected = (thirdDepositAmount * initialTokenSupply) / reserveBalance
+            expect(firstClientBalance).to.equal(firstExpected)
+            expect(secondClientBalance).to.equal(secondExpected)
+            expect(thirdClientBalance).to.equal(thirdExpected)
+
+            const ownerBalance = await token.read.balanceOf([owner.account.address])
+            console.log(ownerBalance)
+            expect(firstClientBalance + secondClientBalance + thirdClientBalance + ownerBalance).to.equal(initialTokenSupply)
+        });
+
+        it('should be the correct balance of tokens after distribution for many depositors ', async () => {
+            const {token, owner} = await deployTokenFixture();
+            const clients = await hre.viem.getWalletClients();
+
+            const depositorsCount = 15;
+            const deposits: bigint[] = new Array(depositorsCount).fill(0n)
+
+            for (let i = 1; i <= depositorsCount; i++) {
+                const depositAmount = generateRandomBigInt(18, 21);
+                deposits[i] = depositAmount;
+                await token.write.deposit({value: depositAmount, account: clients[i].account.address});
+            }
+
+            await sleep(Number(initialAccumulationDuration) * 1000)
+            await token.write.distribute({account: owner.account.address})
+
+            const reserveBalance = await token.read.getReserveBalance()
+            const totalSupply = await token.read.totalSupply()
+            const ownerBalance = await token.read.balanceOf([owner.account.address])
+
+            let clientSum = 0n;
+            for (let i = 1; i <= depositorsCount; i++) {
+                const clientBalance = await token.read.balanceOf([clients[i].account.address])
+                clientSum += clientBalance
+                console.log(`Client ${i} balance: ${stringify(clientBalance)}, initial deposit: ${stringify(deposits[i])}`)
+                expect(clientBalance).to.equal((deposits[i] * totalSupply) / reserveBalance)
+            }
+
+            console.log(`Total supply: ${stringify(totalSupply)}`)
+            console.log(`Reserve balance: ${stringify(reserveBalance)}`)
+            console.log(`Owner balance: ${stringify(ownerBalance)}`)
+            console.log(`Client sum: ${stringify(clientSum)}`)
+            expect(clientSum + ownerBalance).to.equal(totalSupply)
+
+        });
     });
 
     describe('Errors', () => {
