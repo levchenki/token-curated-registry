@@ -26,20 +26,10 @@ function stringify(bigIntValue: bigint): string {
 }
 
 function generateRandomBigInt(minDecimals: number, maxDecimals: number): bigint {
-    // Определяем минимальное и максимальное количество десятичных знаков
     const decimalPlaces = Math.floor(Math.random() * (maxDecimals - minDecimals + 1)) + minDecimals;
-
-    // Максимальное значение для заданного количества десятичных знаков
     const max = BigInt('1' + '0'.repeat(decimalPlaces));
-
-    // Генерация случайного числа в заданном диапазоне десятичных знаков
     return BigInt(Math.floor(Math.random() * Number(max)));
 }
-
-// Пример использования для генерации числа от 18 до 24 десятичных знаков
-const randomBigInt = generateRandomBigInt(18, 24);
-console.log(randomBigInt.toString());
-
 
 describe('AugmentedContinuousToken', () => {
     async function deployTokenFixture() {
@@ -75,6 +65,47 @@ describe('AugmentedContinuousToken', () => {
             const reserveBalance = await token.read.getReserveBalance()
             expect(reserveBalance).to.equal(0n)
         });
+
+        it('should be the correct number of reserve ratio after creation', async () => {
+            const {token} = await deployTokenFixture();
+            const reserveRatio = await token.read.reserveRatio()
+            expect(reserveRatio).to.equal(initialReserveRatio)
+        });
+
+        it('should be the correct accumulation duration after creation', async () => {
+            const {token} = await deployTokenFixture();
+            const accumulationDuration = await token.read.accumulationDuration()
+            expect(accumulationDuration).to.equal(initialAccumulationDuration)
+        });
+
+        it('should be the correct owner after creation', async () => {
+            const {token, owner} = await deployTokenFixture();
+            const contractOwner = (await token.read.owner()).toLowerCase()
+            expect(contractOwner).to.equal(owner.account.address)
+        });
+
+        it('should be the correct owner balance after creation', async () => {
+            const {token, owner} = await deployTokenFixture();
+            const ownerBalance = await token.read.balanceOf([owner.account.address])
+            expect(ownerBalance).to.equal(0n)
+        });
+
+        it('should be the correct owner deposit after creation', async () => {
+            const {token, owner} = await deployTokenFixture();
+            const ownerDeposit = await token.read.deposits([owner.account.address])
+            expect(ownerDeposit).to.equal(0n)
+        });
+
+        it('should be the correct first client balance after creation', async () => {
+            const {token, first} = await deployTokenFixture();
+            const ownerDeposit = await token.read.deposits([first.account.address])
+            expect(ownerDeposit).to.equal(0n)
+        });
+        it('should be the correct first client deposit after creation', async () => {
+            const {token, first} = await deployTokenFixture();
+            const ownerDeposit = await token.read.deposits([first.account.address])
+            expect(ownerDeposit).to.equal(0n)
+        });
     });
 
     describe('Deposits', () => {
@@ -97,6 +128,18 @@ describe('AugmentedContinuousToken', () => {
             await token.write.deposit({value: depositAmount, account: first.account.address});
             const clientBalance = await token.read.balanceOf([first.account.address])
             expect(clientBalance).to.equal(0n)
+        });
+
+        it('should be the zero tokens on owner\'s balance after first deposit', async () => {
+            const {token, owner, first} = await deployTokenFixture();
+            const depositAmount = 1n * BigInt(1e18);
+
+            await token.write.deposit({value: depositAmount, account: first.account.address});
+            const clientBalance = await token.read.balanceOf([first.account.address])
+            const ownerBalance = await token.read.balanceOf([owner.account.address])
+            expect(clientBalance).to.equal(0n)
+            expect(ownerBalance).to.equal(0n)
+            expect(ownerBalance + clientBalance).to.equal(0n)
         });
 
         it('should be the correct number of reserve tokens on depositor\'s balance after first deposit', async () => {
@@ -244,7 +287,6 @@ describe('AugmentedContinuousToken', () => {
             expect(thirdClientBalance).to.equal(thirdExpected)
 
             const ownerBalance = await token.read.balanceOf([owner.account.address])
-            console.log(ownerBalance)
             expect(firstClientBalance + secondClientBalance + thirdClientBalance + ownerBalance).to.equal(initialTokenSupply)
         });
 
