@@ -2,7 +2,7 @@ import "@nomicfoundation/hardhat-viem/internal/type-extensions";
 import hre from "hardhat";
 import {expect} from "chai";
 
-const initialName = 'AugmentedContinuousTokenName';
+const initialName = 'ETHABCContinuousToken';
 const initialSymbol = 'CT';
 const initialTokenSupply = 100_000_000n * BigInt(1e18)
 const initialReserveRatio = 900_000; // from 1 to 1_000_000
@@ -31,10 +31,10 @@ function generateRandomBigInt(minDecimals: number, maxDecimals: number): bigint 
     return BigInt(Math.floor(Math.random() * Number(max)));
 }
 
-describe('AugmentedContinuousToken', () => {
+describe('ETHABCContinuousToken', () => {
     async function deployTokenFixture() {
         const [owner, first, second, third] = await hre.viem.getWalletClients();
-        const token = await hre.viem.deployContract('AugmentedContinuousToken', [
+        const token = await hre.viem.deployContract('ETHABCContinuousToken', [
             initialName,
             initialSymbol,
             initialTokenSupply,
@@ -57,7 +57,7 @@ describe('AugmentedContinuousToken', () => {
         it('should be the correct number of tokens after creation', async () => {
             const {token} = await deployTokenFixture();
             const totalSupply = await token.read.totalSupply()
-            expect(totalSupply).to.equal(initialTokenSupply)
+            expect(totalSupply).to.equal(0n)
         });
 
         it('should be the correct number of reserve tokens after creation', async () => {
@@ -117,7 +117,7 @@ describe('AugmentedContinuousToken', () => {
             const tokenSupply = await token.read.totalSupply()
             const reserveBalance = await token.read.getReserveBalance()
 
-            expect(tokenSupply).to.equal(initialTokenSupply)
+            expect(tokenSupply).to.equal(0n)
             expect(reserveBalance).to.equal(depositAmount)
         });
 
@@ -307,7 +307,7 @@ describe('AugmentedContinuousToken', () => {
             await token.write.distribute({account: owner.account.address})
 
             const reserveBalance = await token.read.getReserveBalance()
-            const totalSupply = await token.read.totalSupply()
+            const totalSupply = await token.read.initialSupply()
             const ownerBalance = await token.read.balanceOf([owner.account.address])
 
             let clientSum = 0n;
