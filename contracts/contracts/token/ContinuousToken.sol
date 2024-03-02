@@ -57,7 +57,7 @@ abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
     }
 
     /**
-    * @param _deposit Amount of tokens to deposit.
+    * @param _deposit Amount of tokens to mint.
     * @dev Mints new tokens in exchange for deposit.
     */
     function _continuousMint(uint _deposit) internal returns (uint) {
