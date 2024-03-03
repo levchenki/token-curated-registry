@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import "./ContinuousToken.sol";
-import {ABCContinuousToken} from "./ABCContinuousToken.sol";
+import "./abstract/ABCContinuousToken.sol";
 
 /**
 * @title ETHABCContinuousToken

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import "./ContinuousToken.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "../../curve/BondingCurve.sol";
 
 /**
 * @title ABCContinuousToken
@@ -19,6 +21,8 @@ abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
 
     event Minted(address sender, uint amount, uint deposit);
     event Burned(address sender, uint amount, uint refund);
+    event Deposited(address sender, uint amount);
+    event Distributed(address to, uint amount);
 
     /**
     * @param _name Name of the token.
@@ -88,6 +92,7 @@ abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
             depositors.push(msg.sender);
         }
         deposits[msg.sender] += depositAmount;
+        emit Deposited(msg.sender, depositAmount);
         reserve += depositAmount;
     }
 
@@ -101,10 +106,12 @@ abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
         for (uint256 i = 0; i < depositors.length; i++) {
             uint256 tokens = _countDistributedTokens(i);
             distributed += tokens;
+            emit Distributed(depositors[i], tokens);
             _mint(depositors[i], tokens);
         }
         if (distributed < initialSupply) {
             uint256 remaining = initialSupply - distributed;
+            emit Distributed(owner(), remaining);
             _mint(owner(), remaining);
         }
         isActive = true;
