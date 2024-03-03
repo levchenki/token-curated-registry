@@ -15,7 +15,7 @@ contract ETHABCContinuousToken is ABCContinuousToken {
         uint _initialSupply,
         uint32 _reserveRatio,
         address _initialOwner,
-        uint256 _accumulationDuration
+        uint _accumulationDuration
     ) ABCContinuousToken(_name, _symbol, _initialSupply, 0, _reserveRatio, _initialOwner, _accumulationDuration) {
     }
 

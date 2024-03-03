@@ -10,14 +10,14 @@ import "../../curve/BondingCurve.sol";
 * @dev ABCContinuousToken is an ERC20 token with a augmented bonding curve
 */
 abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
-    uint256 public accumulationDuration;
-    uint256 public accumulationDateEnd;
+    uint public accumulationDuration;
+    uint public accumulationDateEnd;
     bool public isActive = false;
-    mapping(address => uint256) public deposits;
+    mapping(address => uint) public deposits;
     address[] private depositors;
     uint8 internal constant DECIMALS = 18;
-    uint256 public reserve;
-    uint256 public initialSupply;
+    uint public reserve;
+    uint public initialSupply;
 
     event Minted(address sender, uint amount, uint deposit);
     event Burned(address sender, uint amount, uint refund);
@@ -37,11 +37,11 @@ abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
     constructor(
         string memory _name,
         string memory _symbol,
-        uint256 _initialSupply,
-        uint256 _reserve,
+        uint _initialSupply,
+        uint _reserve,
         uint32 _reserveRatio,
         address _initialOwner,
-        uint256 _accumulationDuration
+        uint _accumulationDuration
     ) ERC20(_name, _symbol) BondingCurve(_reserveRatio) Ownable(_initialOwner) {
         reserve = _reserve;
         initialSupply = _initialSupply;
@@ -86,7 +86,7 @@ abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
     /**
     * @dev Function to deposit ether into the reserve.
     */
-    function _deposit(uint256 depositAmount) internal onlyAccumulationPeriod {
+    function _deposit(uint depositAmount) internal onlyAccumulationPeriod {
         require(depositAmount > 0, "Deposit must be greater than 0");
         if (deposits[msg.sender] == 0) {
             depositors.push(msg.sender);
@@ -102,15 +102,15 @@ abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
     function distribute() public onlyOwner onlyAccumulationPeriod {
         require(block.timestamp >= accumulationDateEnd, "Accumulation duration has not ended yet");
         require(reserve > 0, "Reserve must be greater than 0");
-        uint256 distributed = 0;
-        for (uint256 i = 0; i < depositors.length; i++) {
-            uint256 tokens = _countDistributedTokens(i);
+        uint distributed = 0;
+        for (uint i = 0; i < depositors.length; i++) {
+            uint tokens = _countDistributedTokens(i);
             distributed += tokens;
             emit Distributed(depositors[i], tokens);
             _mint(depositors[i], tokens);
         }
         if (distributed < initialSupply) {
-            uint256 remaining = initialSupply - distributed;
+            uint remaining = initialSupply - distributed;
             emit Distributed(owner(), remaining);
             _mint(owner(), remaining);
         }
@@ -121,9 +121,9 @@ abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
     * @dev Function to count the amount of tokens to be distributed to a depositor.
     * @param depositorIndex The index of the depositor in the depositors array.
     */
-    function _countDistributedTokens(uint256 depositorIndex) internal view returns (uint256) {
-        uint256 depositAmount = deposits[depositors[depositorIndex]];
-        uint256 tokens = depositAmount * initialSupply / reserve;
+    function _countDistributedTokens(uint depositorIndex) internal view returns (uint) {
+        uint depositAmount = deposits[depositors[depositorIndex]];
+        uint tokens = depositAmount * initialSupply / reserve;
         return tokens;
     }
 
@@ -131,7 +131,7 @@ abstract contract ABCContinuousToken is Ownable, ERC20, BondingCurve {
     * @param _depositAmount Amount of tokens to mint.
     * @dev Mints new tokens in exchange for deposit.
     */
-    function _continuousMint(uint256 _depositAmount) internal returns (uint) {
+    function _continuousMint(uint _depositAmount) internal returns (uint) {
         require(_depositAmount > 0, "Deposit must be non-zero.");
 
         uint rewardAmount = getContinuousMintReward(_depositAmount);

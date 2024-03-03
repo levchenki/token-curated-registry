@@ -11,7 +11,7 @@ import "../../curve/BondingCurve.sol";
 * @dev ContinuousToken is an ERC20 token with a bonding curve.
 */
 abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
-    uint256 internal reserve;
+    uint internal reserve;
     uint8 internal constant DECIMALS = 18;
 
     event Minted(address sender, uint amount, uint deposit);
@@ -32,7 +32,7 @@ abstract contract ContinuousToken is Ownable, ERC20, BondingCurve {
         uint _initialSupply,
         uint32 _reserveRatio,
         address _initialOwner,
-        uint256 _reserve
+        uint _reserve
     ) ERC20(_name, _symbol) BondingCurve(_reserveRatio) Ownable(_initialOwner) {
         reserve = _reserve;
         _mint(msg.sender, _initialSupply);

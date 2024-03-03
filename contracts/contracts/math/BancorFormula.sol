@@ -27,10 +27,10 @@ contract BancorFormula is Power {
     *  @return purchase return amount
     */
     function calculatePurchaseReturn(
-        uint256 _supply,
-        uint256 _reserveBalance,
+        uint _supply,
+        uint _reserveBalance,
         uint32 _reserveRatio,
-        uint256 _depositAmount) internal view returns (uint256)
+        uint _depositAmount) internal view returns (uint)
     {
         // validate input
         require(_supply > 0 && _reserveBalance > 0 && _reserveRatio > 0 && _reserveRatio <= MAX_RESERVE_RATIO, "Invalid inputs.");
@@ -45,13 +45,13 @@ contract BancorFormula is Power {
             return (_supply * _depositAmount) / _reserveBalance;
         }
 
-        uint256 result;
+        uint result;
         uint8 precision;
-        uint256 baseN = _depositAmount + _reserveBalance;
+        uint baseN = _depositAmount + _reserveBalance;
         (result, precision) = power(
             baseN, _reserveBalance, _reserveRatio, MAX_RESERVE_RATIO
         );
-        uint256 newTokenSupply = (_supply * result) >> precision;
+        uint newTokenSupply = (_supply * result) >> precision;
         return newTokenSupply - _supply;
     }
 
@@ -70,10 +70,10 @@ contract BancorFormula is Power {
     * @return sale return amount
     */
     function calculateSaleReturn(
-        uint256 _supply,
-        uint256 _reserveBalance,
+        uint _supply,
+        uint _reserveBalance,
         uint32 _reserveRatio,
-        uint256 _sellAmount) internal view returns (uint256)
+        uint _sellAmount) internal view returns (uint)
     {
         // validate input
         require(_supply > 0 && _reserveBalance > 0 && _reserveRatio > 0 && _reserveRatio <= MAX_RESERVE_RATIO && _sellAmount <= _supply, "Invalid inputs.");
@@ -93,14 +93,14 @@ contract BancorFormula is Power {
             return (_reserveBalance * _sellAmount) / _supply;
         }
 
-        uint256 result;
+        uint result;
         uint8 precision;
-        uint256 baseD = _supply - _sellAmount;
+        uint baseD = _supply - _sellAmount;
         (result, precision) = power(
             _supply, baseD, MAX_RESERVE_RATIO, _reserveRatio
         );
-        uint256 oldBalance = _reserveBalance * result;
-        uint256 newBalance = _reserveBalance << precision;
+        uint oldBalance = _reserveBalance * result;
+        uint newBalance = _reserveBalance << precision;
         return (oldBalance - newBalance) / result;
     }
 }

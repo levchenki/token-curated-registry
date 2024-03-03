@@ -17,7 +17,7 @@ pragma solidity ^0.8.20;
 contract Power {
     string private version = "0.3";
 
-    uint256 private constant ONE = 1;
+    uint private constant ONE = 1;
     uint32 private constant MAX_WEIGHT = 1000000;
     uint8 private constant MIN_PRECISION = 32;
     uint8 private constant MAX_PRECISION = 127;
@@ -26,27 +26,27 @@ contract Power {
       The values below depend on MAX_PRECISION. If you choose to change it:
       Apply the same change in file 'PrintIntScalingFactors.py', run it and paste the results below.
     */
-    uint256 private constant FIXED_1 = 0x080000000000000000000000000000000;
-    uint256 private constant FIXED_2 = 0x100000000000000000000000000000000;
-    uint256 private constant MAX_NUM = 0x200000000000000000000000000000000;
+    uint private constant FIXED_1 = 0x080000000000000000000000000000000;
+    uint private constant FIXED_2 = 0x100000000000000000000000000000000;
+    uint private constant MAX_NUM = 0x200000000000000000000000000000000;
 
     /**
         Auto-generated via 'PrintLn2ScalingFactors.py'
     */
-    uint256 private constant LN2_NUMERATOR   = 0x3f80fe03f80fe03f80fe03f80fe03f8;
-    uint256 private constant LN2_DENOMINATOR = 0x5b9de1d10bf4103d647b0955897ba80;
+    uint private constant LN2_NUMERATOR   = 0x3f80fe03f80fe03f80fe03f80fe03f8;
+    uint private constant LN2_DENOMINATOR = 0x5b9de1d10bf4103d647b0955897ba80;
 
     /**
         Auto-generated via 'PrintFunctionOptimalLog.py' and 'PrintFunctionOptimalExp.py'
     */
-    uint256 private constant OPT_LOG_MAX_VAL = 0x15bf0a8b1457695355fb8ac404e7a79e3;
-    uint256 private constant OPT_EXP_MAX_VAL = 0x800000000000000000000000000000000;
+    uint private constant OPT_LOG_MAX_VAL = 0x15bf0a8b1457695355fb8ac404e7a79e3;
+    uint private constant OPT_EXP_MAX_VAL = 0x800000000000000000000000000000000;
 
     /**
       The values below depend on MIN_PRECISION and MAX_PRECISION. If you choose to change either one of them:
       Apply the same change in file 'PrintFunctionBancorFormula.py', run it and paste the results below.
     */
-    uint256[128] private maxExpArray;
+    uint[128] private maxExpArray;
 
     constructor() {
     //  maxExpArray[0] = 0x6bffffffffffffffffffffffffffffffff;
@@ -196,24 +196,24 @@ contract Power {
           This functions assumes that "_expN < 2 ^ 256 / log(MAX_NUM - 1)", otherwise the multiplication should be replaced with a "safeMul".
     */
     function power(
-        uint256 _baseN,
-        uint256 _baseD,
+        uint _baseN,
+        uint _baseD,
         uint32 _expN,
         uint32 _expD
-    ) internal view returns (uint256, uint8)
+    ) internal view returns (uint, uint8)
     {
         require(_baseN < MAX_NUM, "baseN exceeds max value.");
         require(_baseN >= _baseD, "Bases < 1 are not supported.");
 
-        uint256 baseLog;
-        uint256 base = _baseN * FIXED_1 / _baseD;
+        uint baseLog;
+        uint base = _baseN * FIXED_1 / _baseD;
         if (base < OPT_LOG_MAX_VAL) {
             baseLog = optimalLog(base);
         } else {
             baseLog = generalLog(base);
         }
 
-        uint256 baseLogTimesExp = baseLog * _expN / _expD;
+        uint baseLogTimesExp = baseLog * _expN / _expD;
         if (baseLogTimesExp < OPT_EXP_MAX_VAL) {
             return (optimalExp(baseLogTimesExp), MAX_PRECISION);
         } else {
@@ -226,9 +226,9 @@ contract Power {
         Compute log(x / FIXED_1) * FIXED_1.
         This functions assumes that "x >= FIXED_1", because the output would be negative otherwise.
     */
-    function generalLog(uint256 _x) internal pure returns (uint256) {
-        uint256 res = 0;
-        uint256 x = _x;
+    function generalLog(uint _x) internal pure returns (uint) {
+        uint res = 0;
+        uint x = _x;
 
         // If x >= 2, then we compute the integer part of log2(x), which is larger than 0.
         if (x >= FIXED_2) {
@@ -254,9 +254,9 @@ contract Power {
     /**
       Compute the largest integer smaller than or equal to the binary logarithm of the input.
     */
-    function floorLog2(uint256 _n) internal pure returns (uint8) {
+    function floorLog2(uint _n) internal pure returns (uint8) {
         uint8 res = 0;
-        uint256 n = _n;
+        uint n = _n;
 
         if (n < 256) {
             // At most 8 iterations
@@ -282,7 +282,7 @@ contract Power {
         - This function finds the position of [the smallest value in "maxExpArray" larger than or equal to "x"]
         - This function finds the highest position of [a value in "maxExpArray" larger than or equal to "x"]
     */
-    function findPositionInMaxExpArray(uint256 _x)
+    function findPositionInMaxExpArray(uint _x)
     internal view returns (uint8)
     {
         uint8 lo = MIN_PRECISION;
@@ -313,9 +313,9 @@ contract Power {
         The global "maxExpArray" maps each "precision" to "((maximumExponent + 1) << (MAX_PRECISION - precision)) - 1".
         The maximum permitted value for "x" is therefore given by "maxExpArray[precision] >> (MAX_PRECISION - precision)".
     */
-    function generalExp(uint256 _x, uint8 _precision) internal pure returns (uint256) {
-        uint256 xi = _x;
-        uint256 res = 0;
+    function generalExp(uint _x, uint8 _precision) internal pure returns (uint) {
+        uint xi = _x;
+        uint res = 0;
 
         xi = (xi * _x) >> _precision; res += xi * 0x3442c4e6074a82f1797f72ac0000000; // add x^02 * (33! / 02!)
         xi = (xi * _x) >> _precision; res += xi * 0x116b96f757c380fb287fd0e40000000; // add x^03 * (33! / 03!)
@@ -358,12 +358,12 @@ contract Power {
         Input range: FIXED_1 <= x <= LOG_EXP_MAX_VAL - 1
         Auto-generated via 'PrintFunctionOptimalLog.py'
     */
-    function optimalLog(uint256 x) internal pure returns (uint256) {
-        uint256 res = 0;
+    function optimalLog(uint x) internal pure returns (uint) {
+        uint res = 0;
 
-        uint256 y;
-        uint256 z;
-        uint256 w;
+        uint y;
+        uint z;
+        uint w;
 
         if (x >= 0xd3094c70f034de4b96ff7d5b6f99fcd8) {res += 0x40000000000000000000000000000000; x = x * FIXED_1 / 0xd3094c70f034de4b96ff7d5b6f99fcd8;}
         if (x >= 0xa45af1e1f40c333b3de1db4dd55f29a7) {res += 0x20000000000000000000000000000000; x = x * FIXED_1 / 0xa45af1e1f40c333b3de1db4dd55f29a7;}
@@ -393,11 +393,11 @@ contract Power {
         Input range: 0 <= x <= OPT_EXP_MAX_VAL - 1
         Auto-generated via 'PrintFunctionOptimalExp.py'
     */
-    function optimalExp(uint256 x) internal pure returns (uint256) {
-        uint256 res = 0;
+    function optimalExp(uint x) internal pure returns (uint) {
+        uint res = 0;
 
-        uint256 y;
-        uint256 z;
+        uint y;
+        uint z;
 
         z = y = x % 0x10000000000000000000000000000000;
         z = z * y / FIXED_1; res += z * 0x10e1b3be415a0000; // add y^02 * (20! / 02!)
