@@ -7,7 +7,7 @@ const initialSymbol = 'CT';
 const initialTokenSupply = 100_000_000n * BigInt(1e18)
 const initialReserveRatio = 900_000; // from 1 to 1_000_000
 
-const initialAccumulationDuration = 5n;
+const initialAccumulationDuration = 3n;
 
 function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -43,13 +43,18 @@ describe('ETHABCContinuousToken', () => {
             initialAccumulationDuration
         ], {walletClient: owner});
 
+        async function activateToken() {
+            const ms = 1000;
+            await sleep(Number(initialAccumulationDuration) * ms);
+        }
 
         return {
             owner,
             first,
             second,
             third,
-            token
+            token,
+            activateToken
         }
     }
 
@@ -200,43 +205,77 @@ describe('ETHABCContinuousToken', () => {
             expect(depositAfter).to.equal(firstDepositAmount + secondDepositAmount)
         });
 
+        it('should return the correct number of deposit events after one deposit', async () => {
+            const {token, first} = await deployTokenFixture();
+            const depositAmount = 1n * BigInt(1e18);
+
+            const depositEventsBefore = await token.getEvents.Deposited();
+            expect(depositEventsBefore.length).to.equal(0)
+
+            await token.write.deposit({value: depositAmount, account: first.account.address});
+
+            const depositEventsAfter = await token.getEvents.Deposited({fromBlock: 'earliest'});
+            expect(depositEventsAfter.length).to.equal(1)
+        });
+
+        it('should return the correct number of deposit events after five deposits', async () => {
+            const {token, first} = await deployTokenFixture();
+            const depositAmount = 1n * BigInt(1e18);
+
+            const depositEventsBefore = await token.getEvents.Deposited();
+            expect(depositEventsBefore.length).to.equal(0)
+
+            const depositCount = 5;
+            for (let i = 0; i < depositCount; i++) {
+                await token.write.deposit({value: depositAmount, account: first.account.address});
+            }
+
+            const depositEventsAfter = await token.getEvents.Deposited({fromBlock: 'earliest'});
+            expect(depositEventsAfter.length).to.equal(depositCount)
+        });
     });
 
     describe('Deposits distribution', () => {
         it('should be the correct number of reserve tokens after distribution', async () => {
-            const {token, owner, first} = await deployTokenFixture();
+            const {token, owner, first, activateToken} = await deployTokenFixture();
             const depositAmount = 100n * BigInt(1e18);
             await token.write.deposit({value: depositAmount, account: first.account.address});
 
-            await sleep(Number(initialAccumulationDuration) * 1000)
+            await activateToken();
             await token.write.distribute({account: owner.account.address})
 
             const reserveBalance = await token.read.getReserveBalance()
             expect(reserveBalance).to.equal(depositAmount)
+
+            const distributionEvents = await token.getEvents.Distributed({fromBlock: 'earliest'});
+            expect(distributionEvents.length).to.equal(1)
         });
 
 
         it('should be the correct balance of tokens after distribution for one depositor', async () => {
-            const {token, owner, first} = await deployTokenFixture();
+            const {token, owner, first, activateToken} = await deployTokenFixture();
             const depositAmount = 100n * BigInt(1e18);
             await token.write.deposit({value: depositAmount, account: first.account.address});
 
-            await sleep(Number(initialAccumulationDuration) * 1000)
+            await activateToken();
             await token.write.distribute({account: owner.account.address})
 
             const clientBalance = await token.read.balanceOf([first.account.address])
             expect(clientBalance).to.equal(initialTokenSupply)
+
+            const distributionEvents = await token.getEvents.Distributed({fromBlock: 'earliest'});
+            expect(distributionEvents.length).to.equal(1)
         });
 
         it('should be the correct balance of tokens after distribution for two depositors', async () => {
-            const {token, owner, first, second} = await deployTokenFixture();
+            const {token, owner, first, second, activateToken} = await deployTokenFixture();
             const firstDepositAmount = 100n * BigInt(1e18);
             await token.write.deposit({value: firstDepositAmount, account: first.account.address});
 
             const secondDepositAmount = 200n * BigInt(1e18);
             await token.write.deposit({value: secondDepositAmount, account: second.account.address});
 
-            await sleep(Number(initialAccumulationDuration) * 1000)
+            await activateToken();
             await token.write.distribute({account: owner.account.address})
 
             const reserveBalance = await token.read.getReserveBalance()
@@ -252,6 +291,13 @@ describe('ETHABCContinuousToken', () => {
             const ownerBalance = await token.read.balanceOf([owner.account.address])
 
             expect(firstClientBalance + secondClientBalance + ownerBalance).to.equal(initialTokenSupply)
+
+            const distributionEvents = await token.getEvents.Distributed({fromBlock: 'earliest'});
+            if (ownerBalance > 0) {
+                expect(distributionEvents.length).to.equal(3)
+            } else {
+                expect(distributionEvents.length).to.equal(2)
+            }
         });
         it('should be the correct balance of tokens after distribution for three depositors', async () => {
             const {
@@ -259,7 +305,8 @@ describe('ETHABCContinuousToken', () => {
                 owner,
                 first,
                 second,
-                third
+                third,
+                activateToken
             } = await deployTokenFixture();
             const firstDepositAmount = 213n * BigInt(1e18);
             await token.write.deposit({value: firstDepositAmount, account: first.account.address});
@@ -270,7 +317,7 @@ describe('ETHABCContinuousToken', () => {
             const thirdDepositAmount = 1213n * BigInt(1e18);
             await token.write.deposit({value: thirdDepositAmount, account: third.account.address});
 
-            await sleep(Number(initialAccumulationDuration) * 1000)
+            await activateToken();
             await token.write.distribute({account: owner.account.address})
 
             const reserveBalance = await token.read.getReserveBalance()
@@ -288,10 +335,17 @@ describe('ETHABCContinuousToken', () => {
 
             const ownerBalance = await token.read.balanceOf([owner.account.address])
             expect(firstClientBalance + secondClientBalance + thirdClientBalance + ownerBalance).to.equal(initialTokenSupply)
+
+            const distributionEvents = await token.getEvents.Distributed({fromBlock: 'earliest'});
+            if (ownerBalance > 0) {
+                expect(distributionEvents.length).to.equal(4)
+            } else {
+                expect(distributionEvents.length).to.equal(3)
+            }
         });
 
         it('should be the correct balance of tokens after distribution for many depositors ', async () => {
-            const {token, owner} = await deployTokenFixture();
+            const {token, owner, activateToken} = await deployTokenFixture();
             const clients = await hre.viem.getWalletClients();
 
             const depositorsCount = 15;
@@ -303,7 +357,7 @@ describe('ETHABCContinuousToken', () => {
                 await token.write.deposit({value: depositAmount, account: clients[i].account.address});
             }
 
-            await sleep(Number(initialAccumulationDuration) * 1000)
+            await activateToken();
             await token.write.distribute({account: owner.account.address})
 
             const reserveBalance = await token.read.getReserveBalance()
@@ -318,14 +372,264 @@ describe('ETHABCContinuousToken', () => {
                 expect(clientBalance).to.equal((deposits[i] * totalSupply) / reserveBalance)
             }
 
+            const distributionEvents = await token.getEvents.Distributed({fromBlock: 'earliest'});
             console.log(`Total supply: ${stringify(totalSupply)}`)
             console.log(`Reserve balance: ${stringify(reserveBalance)}`)
             console.log(`Owner balance: ${stringify(ownerBalance)}`)
             console.log(`Client sum: ${stringify(clientSum)}`)
             expect(clientSum + ownerBalance).to.equal(totalSupply)
-
+            if (ownerBalance > 0) {
+                expect(distributionEvents.length).to.equal(depositorsCount + 1)
+            } else {
+                expect(distributionEvents.length).to.equal(depositorsCount)
+            }
         });
     });
+
+    describe('Mint', () => {
+        it('should be the correct number of tokens after mint', async () => {
+            const {token, owner, first, activateToken} = await deployTokenFixture();
+            const depositAmount = 100n * BigInt(1e18);
+
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const priceInETH = 2n * BigInt(1e18);
+            const mintedTokens = await token.read.getContinuousMintReward([priceInETH])
+            await token.write.mint({
+                value: priceInETH,
+                account: first.account.address
+            });
+
+            const tokenSupply = await token.read.totalSupply()
+            expect(tokenSupply).to.equal(mintedTokens + initialTokenSupply);
+        });
+
+        it('should be the correct number of reserve balance after mint', async () => {
+            const {token, owner, first, activateToken} = await deployTokenFixture();
+            const depositAmount = 100n * BigInt(1e18);
+
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const priceInETH = 2n * BigInt(1e18);
+            await token.write.mint({
+                value: priceInETH,
+                account: first.account.address
+            });
+
+            const reserveBalance = await token.read.getReserveBalance()
+            expect(reserveBalance).to.equal(priceInETH + depositAmount);
+        });
+
+        it('should be the correct number of token balance after mint', async () => {
+            const {token, owner, first, activateToken} = await deployTokenFixture();
+            const depositAmount = 100n * BigInt(1e18);
+
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const priceInETH = 2n * BigInt(1e18);
+            const mintedTokens = await token.read.getContinuousMintReward([priceInETH])
+            await token.write.mint({
+                value: priceInETH,
+                account: first.account.address
+            });
+
+            const clientBalance = await token.read.balanceOf([first.account.address])
+            expect(clientBalance).to.equal(mintedTokens);
+        });
+
+        it('should be the correct number of token balance after mint for many clients', async () => {
+            const {token, owner, activateToken} = await deployTokenFixture();
+            const clients = await hre.viem.getWalletClients();
+
+            const depositAmount = 100n * BigInt(1e18);
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const clientsCount = 15;
+            const priceInETH = 2n * BigInt(1e18);
+            for (let i = 1; i <= clientsCount; i++) {
+                const mintedTokens = await token.read.getContinuousMintReward([priceInETH])
+                await token.write.mint({
+                    value: priceInETH,
+                    account: clients[i].account.address
+                });
+                const clientBalance = await token.read.balanceOf([clients[i].account.address])
+                expect(clientBalance).to.equal(mintedTokens);
+            }
+
+            const mintEvents = await token.getEvents.Minted({fromBlock: 'earliest'});
+            expect(mintEvents.length).to.equal(clientsCount);
+        });
+
+        it('should increase cost of token after every minting', async () => {
+            const {token, owner, activateToken} = await deployTokenFixture();
+
+            const depositAmount = 100n * BigInt(1e18);
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const iterations = 15;
+            const priceInETH = 1n * BigInt(1e18);
+            let previousPrice;
+            for (let i = 1; i <= iterations; i++) {
+                const reserveBalanceBeforeMint = await token.read.getReserveBalance();
+                const reserveBalanceDiff = reserveBalanceBeforeMint - priceInETH;
+
+                const totalSupplyBeforeMint = await token.read.totalSupply();
+                await token.write.mint({
+                    value: priceInETH,
+                    account: owner.account.address
+                });
+                const totalSupplyAfterMint = await token.read.totalSupply();
+                const totalSupplyDiff = totalSupplyAfterMint - totalSupplyBeforeMint;
+
+                const price = Number(reserveBalanceDiff) / Number(totalSupplyDiff);
+                if (previousPrice) {
+                    expect(price).to.be.greaterThan(previousPrice);
+                }
+                previousPrice = price;
+            }
+        })
+    });
+
+    describe('Burn', () => {
+        it('should be the correct number of tokens after burning', async () => {
+            const {token, owner, activateToken} = await deployTokenFixture();
+            const depositAmount = 100n * BigInt(1e18);
+
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const priceInTokens = 10n * BigInt(1e18);
+            await token.write.burn([priceInTokens], {account: owner.account.address});
+
+            const tokenSupply = await token.read.totalSupply()
+            expect(tokenSupply).to.equal(initialTokenSupply - priceInTokens);
+        })
+
+        it('should be the correct number of reserve balance after burning', async () => {
+            const {token, owner, activateToken} = await deployTokenFixture();
+            const depositAmount = 100n * BigInt(1e18);
+
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const priceInTokens = 10n * BigInt(1e18);
+            const burnReward = await token.read.getContinuousBurnRefund([priceInTokens]);
+            await token.write.burn([priceInTokens], {account: owner.account.address});
+
+            const reserveBalance = await token.read.getReserveBalance()
+            expect(reserveBalance).to.equal(depositAmount - burnReward);
+        })
+
+        it('should be the correct number of token balance after burning', async () => {
+            const {token, owner, activateToken} = await deployTokenFixture();
+            const depositAmount = 100n * BigInt(1e18);
+
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const priceInTokens = 10n * BigInt(1e18);
+            await token.write.burn([priceInTokens], {account: owner.account.address});
+
+            const clientBalance = await token.read.balanceOf([owner.account.address])
+            expect(clientBalance).to.equal(initialTokenSupply - priceInTokens);
+        });
+
+        it('should be the correct number of token balance after burning for many clients', async () => {
+            const {token, owner, activateToken} = await deployTokenFixture();
+            const clients = await hre.viem.getWalletClients();
+            const clientsCount = 10;
+            const depositAmount = 100n * BigInt(1e18);
+
+            for (let i = 0; i < clientsCount; i++) {
+                await token.write.deposit({value: depositAmount, account: clients[i].account.address});
+            }
+
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const priceInTokens = 10n * BigInt(1e18);
+            for (let i = 0; i < clientsCount; i++) {
+                const clientBalanceBefore = await token.read.balanceOf([clients[i].account.address])
+                await token.write.burn([priceInTokens], {account: clients[i].account.address});
+                const clientBalanceAfter = await token.read.balanceOf([clients[i].account.address])
+                expect(clientBalanceBefore - clientBalanceAfter).to.equal(priceInTokens);
+            }
+            const burnEvents = await token.getEvents.Burned({fromBlock: 'earliest'});
+            expect(burnEvents.length).to.equal(clientsCount);
+        });
+
+        it('should be the correct number of reserve balance after burning for many clients', async () => {
+            const {token, owner, activateToken} = await deployTokenFixture();
+            const clients = await hre.viem.getWalletClients();
+            const clientsCount = 10;
+            const depositAmount = 100n * BigInt(1e18);
+
+            for (let i = 0; i < clientsCount; i++) {
+                await token.write.deposit({value: depositAmount, account: clients[i].account.address});
+            }
+
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const priceInTokens = 10n * BigInt(1e18);
+            for (let i = 0; i < clientsCount; i++) {
+                const reserveBalanceBefore = await token.read.getReserveBalance();
+                const burnReward = await token.read.getContinuousBurnRefund([priceInTokens]);
+                await token.write.burn([priceInTokens], {account: clients[i].account.address});
+                const reserveBalanceAfter = await token.read.getReserveBalance();
+                expect(reserveBalanceBefore - reserveBalanceAfter).to.equal(burnReward);
+            }
+            const burnEvents = await token.getEvents.Burned({fromBlock: 'earliest'});
+            expect(burnEvents.length).to.equal(clientsCount);
+        });
+
+        it('should reduce cost of token after every burning', async () => {
+            const {token, owner, activateToken} = await deployTokenFixture();
+
+            const depositAmount = 100n * BigInt(1e18);
+            await token.write.deposit({value: depositAmount, account: owner.account.address});
+            await activateToken();
+            await token.write.distribute({account: owner.account.address})
+
+            const iterations = 15;
+            const priceInContinuousTokens = 10n * BigInt(1e18);
+            const ownerBalance = await token.read.balanceOf([owner.account.address]);
+            let previousPrice;
+            for (let i = 1; i <= iterations && ownerBalance >= priceInContinuousTokens; i++) {
+                const reserveBalanceBeforeBurn = await token.read.getReserveBalance();
+                const totalSupplyBeforeBurn = await token.read.totalSupply();
+
+                await token.write.burn([priceInContinuousTokens], {account: owner.account.address});
+                const reserveBalanceAfterBurn = await token.read.getReserveBalance();
+                const totalSupplyAfterBurn = await token.read.totalSupply();
+
+                const reserveBalanceDiff = reserveBalanceBeforeBurn - reserveBalanceAfterBurn;
+                const totalSupplyDiff = totalSupplyBeforeBurn - totalSupplyAfterBurn;
+
+                const price = Number(reserveBalanceDiff) / Number(totalSupplyDiff);
+                if (previousPrice) {
+                    expect(price).to.be.lessThan(previousPrice);
+                }
+                previousPrice = price;
+            }
+            const burnEvents = await token.getEvents.Burned({fromBlock: 'earliest'});
+            expect(burnEvents.length).to.equal(iterations);
+        });
+    });
+
 
     describe('Errors', () => {
         it('should not allow to deposit zero amount', async () => {
@@ -399,20 +703,20 @@ describe('ETHABCContinuousToken', () => {
         })
 
         it('should be forbidden to distribute deposits with 0 reserve balance', async () => {
-            const {token, owner} = await deployTokenFixture();
+            const {token, owner, activateToken} = await deployTokenFixture();
 
-            await sleep(Number(initialAccumulationDuration) * 1000)
+            await activateToken();
             await expect(token.write.distribute({
                 account: owner.account.address
             })).to.be.rejectedWith('Reserve must be greater than 0')
         })
 
         it('should be forbidden to deposit during the active period', async () => {
-            const {token, owner, first} = await deployTokenFixture();
+            const {token, owner, first, activateToken} = await deployTokenFixture();
             const depositAmount = 1n * BigInt(1e18);
 
             await token.write.deposit({value: depositAmount, account: first.account.address});
-            await sleep(Number(initialAccumulationDuration) * 1000)
+            await activateToken();
             await token.write.distribute({account: owner.account.address})
 
             await expect(token.write.deposit({
@@ -422,11 +726,11 @@ describe('ETHABCContinuousToken', () => {
         });
 
         it('should be forbidden to distribute deposits during the active period', async () => {
-            const {token, owner, first} = await deployTokenFixture();
+            const {token, owner, first, activateToken} = await deployTokenFixture();
             const depositAmount = 1n * BigInt(1e18);
 
             await token.write.deposit({value: depositAmount, account: first.account.address});
-            await sleep(Number(initialAccumulationDuration) * 1000)
+            await activateToken();
             await token.write.distribute({account: owner.account.address})
 
             await expect(token.write.distribute({
