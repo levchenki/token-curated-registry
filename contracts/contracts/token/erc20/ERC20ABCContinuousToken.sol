@@ -45,9 +45,7 @@ contract ERC20ABCContinuousToken is ABCContinuousToken {
     */
     function deposit(uint _amount) public onlyAccumulationPeriod {
         _deposit(_amount);
-        require(IERC20(reserveTokenAddress).balanceOf(msg.sender) >= _amount, "deposit() ERC20.balanceOf failed");
-        IERC20(reserveTokenAddress).approve(msg.sender, _amount);
-        IERC20(reserveTokenAddress).approve(address(this), _amount);
-        IERC20(reserveTokenAddress).transferFrom(msg.sender, address(this), _amount);
+
+        require(IERC20(reserveTokenAddress).transferFrom(msg.sender, address(this), _amount), "deposit() ERC20.transferFrom failed");
     }
 }
