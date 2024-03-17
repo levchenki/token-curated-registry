@@ -1,13 +1,12 @@
-import {ModeToggle} from "@/components/theme/ModeToggle.tsx";
-import {ConnectButton} from "@/components/wallet/ConnectWalletButton.tsx";
-
+import {Main} from "@/layout/Main.tsx";
+import {Header} from "@/layout/Header.tsx";
 
 const App = () => {
 
     return (
-        <div>
-            <ModeToggle/>
-            <ConnectButton/>
+        <div className='flex flex-col h-screen'>
+            <Header/>
+            <Main/>
         </div>
     )
 }
