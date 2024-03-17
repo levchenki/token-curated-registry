@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "dotenv -e ../.env -c -- vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -12,6 +12,8 @@
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-slot": "^1.0.2",
+    "@tanstack/react-query": "^5.28.4",
+    "@web3modal/wagmi": "^4.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "framer-motion": "^11.0.14",
@@ -19,7 +21,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.2.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "viem": "^2.8.10",
+    "wagmi": "^2.5.7"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",
@@ -29,6 +33,7 @@
     "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.18",
+    "dotenv-cli": "^7.4.1",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
