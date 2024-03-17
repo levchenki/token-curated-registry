@@ -4,10 +4,10 @@ import {defineConfig} from "vite"
 
 export default defineConfig({
     plugins: [react()],
+    base: '/token-curated-registry/',
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
         },
-    },
-    base: '/token-curated-registry/'
+    }
 })
