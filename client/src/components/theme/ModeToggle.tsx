@@ -1,8 +1,14 @@
 import {Moon, Sun} from "lucide-react"
 
 import {Button} from "@/components/ui/button.tsx"
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,} from "@/components/ui/dropdown-menu.tsx"
-import {useTheme} from "@/components/theme/ThemeProvider.tsx"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu.tsx"
+import {getSystemTheme, useTheme} from "@/components/theme/ThemeProvider.tsx"
+import {web3Modal} from "@/components/wallet/Web3ModalProvider.tsx";
 
 export const ModeToggle = () => {
     const {setTheme} = useTheme()
@@ -19,13 +25,22 @@ export const ModeToggle = () => {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
+                <DropdownMenuItem onClick={() => {
+                    setTheme("light")
+                    web3Modal.setThemeMode("light")
+                }}>
                     Light
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                <DropdownMenuItem onClick={() => {
+                    setTheme("dark")
+                    web3Modal.setThemeMode("dark")
+                }}>
                     Dark
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
+                <DropdownMenuItem onClick={() => {
+                    setTheme("system")
+                    web3Modal.setThemeMode(getSystemTheme())
+                }}>
                     System
                 </DropdownMenuItem>
             </DropdownMenuContent>

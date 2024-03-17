@@ -20,6 +20,13 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
+export const getSystemTheme = () => {
+    return window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light"
+}
+
 export const ThemeProvider = ({
                                   children,
                                   defaultTheme = "system",
@@ -36,11 +43,7 @@ export const ThemeProvider = ({
         root.classList.remove("light", "dark")
 
         if (theme === "system") {
-            const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-                .matches
-                ? "dark"
-                : "light"
-
+            const systemTheme = getSystemTheme()
             root.classList.add(systemTheme)
             return
         }

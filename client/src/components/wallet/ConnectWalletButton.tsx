@@ -1,17 +1,16 @@
 import {useAccount} from "wagmi";
 
 import {Button} from "@/components/ui/button.tsx";
-import {useWeb3Modal} from "@web3modal/wagmi/react";
+import {web3Modal} from "@/components/wallet/Web3ModalProvider.tsx";
 
 export const ConnectButton = () => {
     const {isConnected} = useAccount()
-    const {open} = useWeb3Modal()
 
     return (
         <>
             <Button
                 variant={isConnected ? 'default' : 'destructive'}
-                onClick={() => open()}>
+                onClick={() => web3Modal.open()}>
                 {isConnected ? 'Connected' : 'Connect'}
             </Button>
         </>
