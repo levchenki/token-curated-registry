@@ -32,7 +32,4 @@ export const routes: IRoutes[] = [
         path: RoutePaths.token,
         element: <TokenPage/>
     },
-
 ]
-
-

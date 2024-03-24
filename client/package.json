@@ -7,7 +7,8 @@
     "dev": "dotenv -e ../.env -c -- vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-abi": "dotenv -e ../.env -c -- npx @wagmi/cli generate"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
@@ -30,7 +31,7 @@
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "viem": "^2.8.10",
-    "wagmi": "^2.5.7"
+    "wagmi": "^2.5.12"
   },
   "devDependencies": {
     "@types/node": "^20.11.28",
@@ -39,6 +40,7 @@
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react-swc": "^3.5.0",
+    "@wagmi/cli": "^1.5.2",
     "autoprefixer": "^10.4.18",
     "dotenv-cli": "^7.4.1",
     "eslint": "^8.57.0",
