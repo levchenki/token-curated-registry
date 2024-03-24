@@ -4,7 +4,7 @@ import {Eye} from "lucide-react";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip.tsx"
 
 
-export const TokenButton = () => {
+export const ShowTokenButton = () => {
     return (
         <TooltipProvider>
             <Tooltip>

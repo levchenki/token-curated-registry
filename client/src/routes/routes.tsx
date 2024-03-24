@@ -1,4 +1,7 @@
 import React from "react";
+import {RegistryPage} from "@/pages/RegistryPage.tsx";
+import {VotingPage} from "@/pages/VotingPage.tsx";
+import {TokenPage} from "@/pages/TokenPage.tsx";
 
 interface IRoutes {
     path: RoutePaths,
@@ -15,19 +18,19 @@ const enum RoutePaths {
 export const routes: IRoutes[] = [
     {
         path: RoutePaths.home,
-        element: <div>Registry</div>
+        element: <RegistryPage/>
     },
     {
         path: RoutePaths.registry,
-        element: <div>Registry</div>
+        element: <RegistryPage/>
     },
     {
         path: RoutePaths.voting,
-        element: <div>Voting</div>
+        element: <VotingPage/>
     },
     {
         path: RoutePaths.token,
-        element: <div>Token</div>
+        element: <TokenPage/>
     },
 
 ]
