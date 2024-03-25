@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx"
 import {getSystemTheme, useTheme} from "@/components/theme/ThemeProvider.tsx"
-import {web3Modal} from "@/components/wallet/Web3ModalProvider.tsx";
+import {web3Modal} from "@/utils/web3Modal.ts";
 
 export const ModeToggle = () => {
     const {setTheme} = useTheme()

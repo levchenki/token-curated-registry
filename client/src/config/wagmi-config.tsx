@@ -1,5 +1,5 @@
 import {createConfig, http} from 'wagmi'
-import {mainnet, sepolia} from 'wagmi/chains'
+import {sepolia} from 'wagmi/chains'
 import {coinbaseWallet, injected, walletConnect} from 'wagmi/connectors'
 
 
@@ -13,9 +13,8 @@ const metadata = {
 }
 
 export const wagmiConfig = createConfig({
-    chains: [mainnet, sepolia],
+    chains: [sepolia],
     transports: {
-        [mainnet.id]: http(),
         [sepolia.id]: http(),
     },
     connectors: [
@@ -26,4 +25,4 @@ export const wagmiConfig = createConfig({
             appLogoUrl: metadata.icons[0]
         }),
     ]
-})
+});

@@ -1,4 +1,8 @@
-export const stringifyBigInt = (num: bigint): string => {
+export const stringifyBigInt = (num: bigint | undefined): string => {
+    if (!num) {
+        return '...'
+    }
+
     if (num === 0n) {
         return '0'
     }

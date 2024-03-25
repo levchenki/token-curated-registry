@@ -1,22 +1,17 @@
 import {defineConfig} from '@wagmi/cli';
-import {sepolia} from '@wagmi/core/chains';
-import {etherscan, react} from '@wagmi/cli/plugins';
-
+import {tokenABI} from "./src/types/abi";
+import {react} from '@wagmi/cli/plugins';
 
 export default defineConfig({
-    out: 'src/types/contracts.ts',
-    contracts: [],
+    out: 'src/types/clients.ts',
+    contracts: [
+        {
+            abi: tokenABI,
+            address: process.env.VITE_TOKEN_CONTRACT_ADDRESS as `0x${string}`,
+            name: 'ABCToken',
+        }
+    ],
     plugins: [
-        etherscan({
-            apiKey: process.env.ETHERSCAN_API_KEY,
-            contracts: [
-                {
-                    name: 'Token',
-                    address: process.env.TOKEN_CONTRACT_ADDRESS as `0x${string}`,
-                },
-            ],
-            chainId: sepolia.id,
-        }),
         react()
     ],
 });

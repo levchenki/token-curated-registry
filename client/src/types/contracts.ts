@@ -1,30 +1,16 @@
 import {
-  useContractRead,
-  UseContractReadConfig,
-  useContractWrite,
-  Address,
-  UseContractWriteConfig,
-  usePrepareContractWrite,
-  UsePrepareContractWriteConfig,
-  useContractEvent,
-  UseContractEventConfig,
-} from 'wagmi'
-import {
-  ReadContractResult,
-  WriteContractMode,
-  PrepareWriteContractResult,
-} from 'wagmi/actions'
+  createUseReadContract,
+  createUseWriteContract,
+  createUseSimulateContract,
+  createUseWatchContractEvent,
+} from 'wagmi/codegen'
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Token
+// ABCToken
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
- */
-export const tokenABI = [
+export const abcTokenAbi = [
   {
-    stateMutability: 'nonpayable',
     type: 'constructor',
     inputs: [
       { name: '_name', internalType: 'string', type: 'string' },
@@ -43,6 +29,7 @@ export const tokenABI = [
         type: 'address',
       },
     ],
+    stateMutability: 'nonpayable',
   },
   {
     type: 'error',
@@ -235,21 +222,20 @@ export const tokenABI = [
     name: 'Transfer',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'accumulationDateEnd',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'accumulationDuration',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [
       { name: 'owner', internalType: 'address', type: 'address' },
@@ -257,9 +243,9 @@ export const tokenABI = [
     ],
     name: 'allowance',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [
       { name: 'spender', internalType: 'address', type: 'address' },
@@ -267,51 +253,51 @@ export const tokenABI = [
     ],
     name: 'approve',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
     name: 'balanceOf',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [{ name: '_amount', internalType: 'uint256', type: 'uint256' }],
     name: 'burn',
     outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
-    stateMutability: 'pure',
     type: 'function',
     inputs: [],
     name: 'decimals',
     outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'pure',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [{ name: '_amount', internalType: 'uint256', type: 'uint256' }],
     name: 'deposit',
     outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [{ name: '', internalType: 'address', type: 'address' }],
     name: 'deposits',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [],
     name: 'distribute',
     outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [
       {
@@ -322,109 +308,109 @@ export const tokenABI = [
     ],
     name: 'getContinuousBurnRefund',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [
       { name: '_reserveTokenAmount', internalType: 'uint256', type: 'uint256' },
     ],
     name: 'getContinuousMintReward',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'getContinuousSupply',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'getReserveBalance',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'initialSupply',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'isActive',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [{ name: '_amount', internalType: 'uint256', type: 'uint256' }],
     name: 'mint',
     outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'name',
     outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'owner',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
+    stateMutability: 'nonpayable',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'reserve',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'reserveRatio',
     outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'reserveTokenAddress',
     outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'symbol',
     outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'view',
     type: 'function',
     inputs: [],
     name: 'totalSupply',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [
       { name: 'to', internalType: 'address', type: 'address' },
@@ -432,9 +418,9 @@ export const tokenABI = [
     ],
     name: 'transfer',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [
       { name: 'from', internalType: 'address', type: 'address' },
@@ -443,1139 +429,475 @@ export const tokenABI = [
     ],
     name: 'transferFrom',
     outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
   },
   {
-    stateMutability: 'nonpayable',
     type: 'function',
     inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
     name: 'transferOwnership',
     outputs: [],
+    stateMutability: 'nonpayable',
   },
 ] as const
 
-/**
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
- */
-export const tokenAddress = {
-  11155111: '0x7951050A6c67686ECE0f55B88B820f695552e7E9',
-} as const
+export const abcTokenAddress =
+  '0x7951050A6c67686ECE0f55B88B820f695552e7E9' as const
 
-/**
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
- */
-export const tokenConfig = { address: tokenAddress, abi: tokenABI } as const
+export const abcTokenConfig = {
+  address: abcTokenAddress,
+  abi: abcTokenAbi,
+} as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__
  */
-export function useTokenRead<
-  TFunctionName extends string,
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcToken = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"accumulationDateEnd"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"accumulationDateEnd"`
  */
-export function useTokenAccumulationDateEnd<
-  TFunctionName extends 'accumulationDateEnd',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useReadAbcTokenAccumulationDateEnd =
+  /*#__PURE__*/ createUseReadContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'accumulationDateEnd',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+  })
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"accumulationDuration"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"accumulationDuration"`
  */
-export function useTokenAccumulationDuration<
-  TFunctionName extends 'accumulationDuration',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useReadAbcTokenAccumulationDuration =
+  /*#__PURE__*/ createUseReadContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'accumulationDuration',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+  })
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"allowance"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"allowance"`
  */
-export function useTokenAllowance<
-  TFunctionName extends 'allowance',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'allowance',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'allowance',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"balanceOf"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"balanceOf"`
  */
-export function useTokenBalanceOf<
-  TFunctionName extends 'balanceOf',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'balanceOf',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'balanceOf',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"decimals"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"decimals"`
  */
-export function useTokenDecimals<
-  TFunctionName extends 'decimals',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'decimals',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'decimals',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"deposits"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"deposits"`
  */
-export function useTokenDeposits<
-  TFunctionName extends 'deposits',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'deposits',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenDeposits = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'deposits',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"getContinuousBurnRefund"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"getContinuousBurnRefund"`
  */
-export function useTokenGetContinuousBurnRefund<
-  TFunctionName extends 'getContinuousBurnRefund',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useReadAbcTokenGetContinuousBurnRefund =
+  /*#__PURE__*/ createUseReadContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'getContinuousBurnRefund',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+  })
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"getContinuousMintReward"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"getContinuousMintReward"`
  */
-export function useTokenGetContinuousMintReward<
-  TFunctionName extends 'getContinuousMintReward',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useReadAbcTokenGetContinuousMintReward =
+  /*#__PURE__*/ createUseReadContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'getContinuousMintReward',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+  })
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"getContinuousSupply"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"getContinuousSupply"`
  */
-export function useTokenGetContinuousSupply<
-  TFunctionName extends 'getContinuousSupply',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useReadAbcTokenGetContinuousSupply =
+  /*#__PURE__*/ createUseReadContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'getContinuousSupply',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+  })
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"getReserveBalance"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"getReserveBalance"`
  */
-export function useTokenGetReserveBalance<
-  TFunctionName extends 'getReserveBalance',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useReadAbcTokenGetReserveBalance =
+  /*#__PURE__*/ createUseReadContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'getReserveBalance',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+  })
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"initialSupply"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"initialSupply"`
  */
-export function useTokenInitialSupply<
-  TFunctionName extends 'initialSupply',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'initialSupply',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenInitialSupply = /*#__PURE__*/ createUseReadContract(
+  { abi: abcTokenAbi, address: abcTokenAddress, functionName: 'initialSupply' },
+)
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"isActive"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"isActive"`
  */
-export function useTokenIsActive<
-  TFunctionName extends 'isActive',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'isActive',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenIsActive = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'isActive',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"name"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"name"`
  */
-export function useTokenName<
-  TFunctionName extends 'name',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'name',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenName = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'name',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"owner"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"owner"`
  */
-export function useTokenOwner<
-  TFunctionName extends 'owner',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'owner',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenOwner = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'owner',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"reserve"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"reserve"`
  */
-export function useTokenReserve<
-  TFunctionName extends 'reserve',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'reserve',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenReserve = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'reserve',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"reserveRatio"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"reserveRatio"`
  */
-export function useTokenReserveRatio<
-  TFunctionName extends 'reserveRatio',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'reserveRatio',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenReserveRatio = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'reserveRatio',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"reserveTokenAddress"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"reserveTokenAddress"`
  */
-export function useTokenReserveTokenAddress<
-  TFunctionName extends 'reserveTokenAddress',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useReadAbcTokenReserveTokenAddress =
+  /*#__PURE__*/ createUseReadContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'reserveTokenAddress',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+  })
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"symbol"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"symbol"`
  */
-export function useTokenSymbol<
-  TFunctionName extends 'symbol',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'symbol',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'symbol',
+})
 
 /**
- * Wraps __{@link useContractRead}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"totalSupply"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"totalSupply"`
  */
-export function useTokenTotalSupply<
-  TFunctionName extends 'totalSupply',
-  TSelectData = ReadContractResult<typeof tokenABI, TFunctionName>,
->(
-  config: Omit<
-    UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractRead({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'totalSupply',
-    ...config,
-  } as UseContractReadConfig<typeof tokenABI, TFunctionName, TSelectData>)
-}
+export const useReadAbcTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'totalSupply',
+})
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__
  */
-export function useTokenWrite<
-  TFunctionName extends string,
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<typeof tokenABI, string>['request']['abi'],
-        TFunctionName,
-        TMode
-      > & { address?: Address; chainId?: TChainId }
-    : UseContractWriteConfig<typeof tokenABI, TFunctionName, TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, TFunctionName, TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    ...config,
-  } as any)
-}
+export const useWriteAbcToken = /*#__PURE__*/ createUseWriteContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+})
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"approve"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"approve"`
  */
-export function useTokenApprove<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenABI,
-          'approve'
-        >['request']['abi'],
-        'approve',
-        TMode
-      > & { address?: Address; chainId?: TChainId; functionName?: 'approve' }
-    : UseContractWriteConfig<typeof tokenABI, 'approve', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'approve'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'approve', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'approve',
-    ...config,
-  } as any)
-}
+export const useWriteAbcTokenApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'approve',
+})
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"burn"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"burn"`
  */
-export function useTokenBurn<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<typeof tokenABI, 'burn'>['request']['abi'],
-        'burn',
-        TMode
-      > & { address?: Address; chainId?: TChainId; functionName?: 'burn' }
-    : UseContractWriteConfig<typeof tokenABI, 'burn', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'burn'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'burn', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'burn',
-    ...config,
-  } as any)
-}
+export const useWriteAbcTokenBurn = /*#__PURE__*/ createUseWriteContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'burn',
+})
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"deposit"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"deposit"`
  */
-export function useTokenDeposit<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenABI,
-          'deposit'
-        >['request']['abi'],
-        'deposit',
-        TMode
-      > & { address?: Address; chainId?: TChainId; functionName?: 'deposit' }
-    : UseContractWriteConfig<typeof tokenABI, 'deposit', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'deposit'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'deposit', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'deposit',
-    ...config,
-  } as any)
-}
+export const useWriteAbcTokenDeposit = /*#__PURE__*/ createUseWriteContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'deposit',
+})
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"distribute"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"distribute"`
  */
-export function useTokenDistribute<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenABI,
-          'distribute'
-        >['request']['abi'],
-        'distribute',
-        TMode
-      > & { address?: Address; chainId?: TChainId; functionName?: 'distribute' }
-    : UseContractWriteConfig<typeof tokenABI, 'distribute', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'distribute'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'distribute', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'distribute',
-    ...config,
-  } as any)
-}
+export const useWriteAbcTokenDistribute = /*#__PURE__*/ createUseWriteContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'distribute',
+})
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"mint"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"mint"`
  */
-export function useTokenMint<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<typeof tokenABI, 'mint'>['request']['abi'],
-        'mint',
-        TMode
-      > & { address?: Address; chainId?: TChainId; functionName?: 'mint' }
-    : UseContractWriteConfig<typeof tokenABI, 'mint', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'mint'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'mint', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'mint',
-    ...config,
-  } as any)
-}
+export const useWriteAbcTokenMint = /*#__PURE__*/ createUseWriteContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'mint',
+})
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"renounceOwnership"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"renounceOwnership"`
  */
-export function useTokenRenounceOwnership<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenABI,
-          'renounceOwnership'
-        >['request']['abi'],
-        'renounceOwnership',
-        TMode
-      > & {
-        address?: Address
-        chainId?: TChainId
-        functionName?: 'renounceOwnership'
-      }
-    : UseContractWriteConfig<typeof tokenABI, 'renounceOwnership', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'renounceOwnership'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'renounceOwnership', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWriteAbcTokenRenounceOwnership =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'renounceOwnership',
-    ...config,
-  } as any)
-}
+  })
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"transfer"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"transfer"`
  */
-export function useTokenTransfer<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenABI,
-          'transfer'
-        >['request']['abi'],
-        'transfer',
-        TMode
-      > & { address?: Address; chainId?: TChainId; functionName?: 'transfer' }
-    : UseContractWriteConfig<typeof tokenABI, 'transfer', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'transfer'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'transfer', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'transfer',
-    ...config,
-  } as any)
-}
+export const useWriteAbcTokenTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'transfer',
+})
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"transferFrom"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"transferFrom"`
  */
-export function useTokenTransferFrom<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenABI,
-          'transferFrom'
-        >['request']['abi'],
-        'transferFrom',
-        TMode
-      > & {
-        address?: Address
-        chainId?: TChainId
-        functionName?: 'transferFrom'
-      }
-    : UseContractWriteConfig<typeof tokenABI, 'transferFrom', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'transferFrom'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'transferFrom', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWriteAbcTokenTransferFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'transferFrom',
-    ...config,
-  } as any)
-}
+  })
 
 /**
- * Wraps __{@link useContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"transferOwnership"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"transferOwnership"`
  */
-export function useTokenTransferOwnership<
-  TMode extends WriteContractMode = undefined,
-  TChainId extends number = keyof typeof tokenAddress,
->(
-  config: TMode extends 'prepared'
-    ? UseContractWriteConfig<
-        PrepareWriteContractResult<
-          typeof tokenABI,
-          'transferOwnership'
-        >['request']['abi'],
-        'transferOwnership',
-        TMode
-      > & {
-        address?: Address
-        chainId?: TChainId
-        functionName?: 'transferOwnership'
-      }
-    : UseContractWriteConfig<typeof tokenABI, 'transferOwnership', TMode> & {
-        abi?: never
-        address?: never
-        chainId?: TChainId
-        functionName?: 'transferOwnership'
-      } = {} as any,
-) {
-  return useContractWrite<typeof tokenABI, 'transferOwnership', TMode>({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWriteAbcTokenTransferOwnership =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'transferOwnership',
-    ...config,
-  } as any)
-}
+  })
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__
  */
-export function usePrepareTokenWrite<TFunctionName extends string>(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, TFunctionName>,
-    'abi' | 'address'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, TFunctionName>)
-}
+export const useSimulateAbcToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+})
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"approve"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"approve"`
  */
-export function usePrepareTokenApprove(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'approve'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useSimulateAbcTokenApprove =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'approve',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'approve'>)
-}
+  })
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"burn"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"burn"`
  */
-export function usePrepareTokenBurn(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'burn'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'burn',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'burn'>)
-}
+export const useSimulateAbcTokenBurn = /*#__PURE__*/ createUseSimulateContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'burn',
+})
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"deposit"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"deposit"`
  */
-export function usePrepareTokenDeposit(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'deposit'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useSimulateAbcTokenDeposit =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'deposit',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'deposit'>)
-}
+  })
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"distribute"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"distribute"`
  */
-export function usePrepareTokenDistribute(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'distribute'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useSimulateAbcTokenDistribute =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'distribute',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'distribute'>)
-}
+  })
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"mint"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"mint"`
  */
-export function usePrepareTokenMint(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'mint'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    functionName: 'mint',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'mint'>)
-}
+export const useSimulateAbcTokenMint = /*#__PURE__*/ createUseSimulateContract({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+  functionName: 'mint',
+})
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"renounceOwnership"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"renounceOwnership"`
  */
-export function usePrepareTokenRenounceOwnership(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'renounceOwnership'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useSimulateAbcTokenRenounceOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'renounceOwnership',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'renounceOwnership'>)
-}
+  })
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"transfer"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"transfer"`
  */
-export function usePrepareTokenTransfer(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'transfer'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useSimulateAbcTokenTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'transfer',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'transfer'>)
-}
+  })
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"transferFrom"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"transferFrom"`
  */
-export function usePrepareTokenTransferFrom(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'transferFrom'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useSimulateAbcTokenTransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'transferFrom',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'transferFrom'>)
-}
+  })
 
 /**
- * Wraps __{@link usePrepareContractWrite}__ with `abi` set to __{@link tokenABI}__ and `functionName` set to `"transferOwnership"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link abcTokenAbi}__ and `functionName` set to `"transferOwnership"`
  */
-export function usePrepareTokenTransferOwnership(
-  config: Omit<
-    UsePrepareContractWriteConfig<typeof tokenABI, 'transferOwnership'>,
-    'abi' | 'address' | 'functionName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return usePrepareContractWrite({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useSimulateAbcTokenTransferOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     functionName: 'transferOwnership',
-    ...config,
-  } as UsePrepareContractWriteConfig<typeof tokenABI, 'transferOwnership'>)
-}
+  })
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenABI}__.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link abcTokenAbi}__
  */
-export function useTokenEvent<TEventName extends string>(
-  config: Omit<
-    UseContractEventConfig<typeof tokenABI, TEventName>,
-    'abi' | 'address'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractEvent({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
-    ...config,
-  } as UseContractEventConfig<typeof tokenABI, TEventName>)
-}
+export const useWatchAbcTokenEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: abcTokenAbi,
+  address: abcTokenAddress,
+})
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenABI}__ and `eventName` set to `"Approval"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link abcTokenAbi}__ and `eventName` set to `"Approval"`
  */
-export function useTokenApprovalEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenABI, 'Approval'>,
-    'abi' | 'address' | 'eventName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractEvent({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWatchAbcTokenApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     eventName: 'Approval',
-    ...config,
-  } as UseContractEventConfig<typeof tokenABI, 'Approval'>)
-}
+  })
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenABI}__ and `eventName` set to `"Burned"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link abcTokenAbi}__ and `eventName` set to `"Burned"`
  */
-export function useTokenBurnedEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenABI, 'Burned'>,
-    'abi' | 'address' | 'eventName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractEvent({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWatchAbcTokenBurnedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     eventName: 'Burned',
-    ...config,
-  } as UseContractEventConfig<typeof tokenABI, 'Burned'>)
-}
+  })
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenABI}__ and `eventName` set to `"Deposited"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link abcTokenAbi}__ and `eventName` set to `"Deposited"`
  */
-export function useTokenDepositedEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenABI, 'Deposited'>,
-    'abi' | 'address' | 'eventName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractEvent({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWatchAbcTokenDepositedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     eventName: 'Deposited',
-    ...config,
-  } as UseContractEventConfig<typeof tokenABI, 'Deposited'>)
-}
+  })
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenABI}__ and `eventName` set to `"Distributed"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link abcTokenAbi}__ and `eventName` set to `"Distributed"`
  */
-export function useTokenDistributedEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenABI, 'Distributed'>,
-    'abi' | 'address' | 'eventName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractEvent({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWatchAbcTokenDistributedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     eventName: 'Distributed',
-    ...config,
-  } as UseContractEventConfig<typeof tokenABI, 'Distributed'>)
-}
+  })
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenABI}__ and `eventName` set to `"Minted"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link abcTokenAbi}__ and `eventName` set to `"Minted"`
  */
-export function useTokenMintedEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenABI, 'Minted'>,
-    'abi' | 'address' | 'eventName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractEvent({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWatchAbcTokenMintedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     eventName: 'Minted',
-    ...config,
-  } as UseContractEventConfig<typeof tokenABI, 'Minted'>)
-}
+  })
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenABI}__ and `eventName` set to `"OwnershipTransferred"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link abcTokenAbi}__ and `eventName` set to `"OwnershipTransferred"`
  */
-export function useTokenOwnershipTransferredEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenABI, 'OwnershipTransferred'>,
-    'abi' | 'address' | 'eventName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractEvent({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWatchAbcTokenOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     eventName: 'OwnershipTransferred',
-    ...config,
-  } as UseContractEventConfig<typeof tokenABI, 'OwnershipTransferred'>)
-}
+  })
 
 /**
- * Wraps __{@link useContractEvent}__ with `abi` set to __{@link tokenABI}__ and `eventName` set to `"Transfer"`.
- *
- * [__View Contract on Sepolia Etherscan__](https://sepolia.etherscan.io/address/0x7951050A6c67686ECE0f55B88B820f695552e7E9)
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link abcTokenAbi}__ and `eventName` set to `"Transfer"`
  */
-export function useTokenTransferEvent(
-  config: Omit<
-    UseContractEventConfig<typeof tokenABI, 'Transfer'>,
-    'abi' | 'address' | 'eventName'
-  > & { chainId?: keyof typeof tokenAddress } = {} as any,
-) {
-  return useContractEvent({
-    abi: tokenABI,
-    address: tokenAddress[11155111],
+export const useWatchAbcTokenTransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: abcTokenAbi,
+    address: abcTokenAddress,
     eventName: 'Transfer',
-    ...config,
-  } as UseContractEventConfig<typeof tokenABI, 'Transfer'>)
-}
+  })
