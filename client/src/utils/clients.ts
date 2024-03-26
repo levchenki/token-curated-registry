@@ -19,3 +19,11 @@ watchAccount(wagmiConfig, {
 
 export const $walletClient = signal<WalletClient | undefined>(undefined);
 export const publicClient = wagmiConfig.getClient({chainId: sepolia.id})
+
+export const getAccount = async () => {
+    return $walletClient.value?.account
+}
+
+export const getChain = async () => {
+    return $walletClient.value?.chain
+}
