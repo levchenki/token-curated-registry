@@ -1,5 +1,5 @@
 import {sepolia} from "wagmi/chains";
-import {signal} from "@preact/signals-react";
+import {computed, signal} from "@preact/signals-react";
 import {WalletClient} from "viem";
 import {wagmiConfig} from "@/config/wagmi-config.tsx";
 import {GetAccountReturnType, getWalletClient, watchAccount} from "wagmi/actions";
@@ -8,8 +8,8 @@ import {GetAccountReturnType, getWalletClient, watchAccount} from "wagmi/actions
 watchAccount(wagmiConfig, {
     async onChange(data: GetAccountReturnType) {
         const status = data.status;
-
         if (status === 'connected') {
+
             $walletClient.value = await getWalletClient(wagmiConfig);
         } else {
             $walletClient.value = undefined
@@ -18,12 +18,6 @@ watchAccount(wagmiConfig, {
 })
 
 export const $walletClient = signal<WalletClient | undefined>(undefined);
+export const $account = computed(() => $walletClient.value?.account);
+export const $chain = computed(() => $walletClient.value?.chain);
 export const publicClient = wagmiConfig.getClient({chainId: sepolia.id})
-
-export const getAccount = async () => {
-    return $walletClient.value?.account
-}
-
-export const getChain = async () => {
-    return $walletClient.value?.chain
-}

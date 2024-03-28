@@ -10,8 +10,5 @@ export const $tokenContract = computed(() => {
         address: abcTokenAddress,
         client: {public: publicClient, wallet: $walletClient.value!, chain: publicClient.chain},
     });
-    return {
-        ...contract,
-        write: $walletClient.value ? contract.write : undefined
-    }
+    return contract;
 })
