@@ -16,6 +16,7 @@ import {useTokenStore} from "@/store/useTokenStore.ts";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {ChangeEvent, useState} from "react";
 import {stringifyBigInt} from "@/utils/helpers.ts";
+import {LoaderIcon} from "lucide-react";
 
 const mintFormSchema = z.object({
     mintedValue: z.preprocess(n => Number(n), z.number().positive().max(999999999999999))
@@ -28,9 +29,10 @@ interface MintTokensFormProps {
 export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
     const {toast} = useToast()
     const [mintReward, setMintReward] = useState<bigint>()
-    const {mint, getMintReward} = useTokenStore((state) => ({
+    const {mint, getMintReward, isMinting} = useTokenStore((state) => ({
         mint: state.mint,
         getMintReward: state.getMintReward,
+        isMinting: state.isMinting,
     }))
 
     const mintForm = useForm<z.infer<typeof mintFormSchema>>({
@@ -43,10 +45,19 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
     const onMintFormSubmit = async (values: z.infer<typeof mintFormSchema>) => {
         const converted = BigInt(values.mintedValue) * BigInt(1e18)
         await mint(converted)
-        toast({
-            title: 'Minted',
-            description: 'Minted'
-        })
+            .then(() => {
+                toast({
+                    title: 'Minted',
+                    description: 'Minted'
+                })
+            })
+            .catch(e => {
+                toast({
+                    title: 'Error',
+                    variant: 'destructive',
+                    description: e.message
+                })
+            })
     }
 
     const onMintValueChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +110,13 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
                                            }}
                                     />
                                 </FormControl>
-                                <Button disabled={disabled} type="submit">Mint</Button>
+                                <Button disabled={disabled || isMinting} type="submit">
+                                    {
+                                        isMinting
+                                            ? <LoaderIcon className="animate-spin"/>
+                                            : 'Mint'
+                                    }
+                                </Button>
                             </div>
                             <FormDescription>
                                 {
