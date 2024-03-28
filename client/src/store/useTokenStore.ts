@@ -9,6 +9,8 @@ interface BalanceStore {
 
     mint: (amount: bigint) => Promise<void>
     burn: (amount: bigint) => Promise<void>
+    getMintReward: (amount: bigint) => Promise<bigint>
+    getBurnRefund: (amount: bigint) => Promise<bigint>
 }
 
 export const useTokenStore = createWithEqualityFn<BalanceStore>()(
@@ -47,7 +49,15 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
                 }
                 console.log(amount)
                 await tokenContract.write.mint([amount], {account: account.address, chain})
-            }
+            },
+            getMintReward: async (amount: bigint) => {
+                const tokenContract = $tokenContract.peek()
+                return await tokenContract.read.getContinuousMintReward([amount])
+            },
+            getBurnRefund: async (amount: bigint) => {
+                const tokenContract = $tokenContract.peek()
+                return await tokenContract.read.getContinuousBurnRefund([amount])
+            },
         }),
         {
             name: 'token'

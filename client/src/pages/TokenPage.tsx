@@ -5,8 +5,7 @@ import {useAccount} from 'wagmi';
 import {stringifyBigInt} from '@/utils/helpers.ts';
 
 import {abcTokenAddress, useReadAbcTokenBalanceOf} from '@/types/contracts.ts';
-import {MintTokensForm} from "@/components/token/MintTokensForm.tsx";
-import {BurnTokensForm} from "@/components/token/BurnTokensForm.tsx";
+import {TokenInputsForm} from "@/components/token/TokenInputsForm.tsx";
 
 
 export const TokenPage = () => {
@@ -36,16 +35,15 @@ export const TokenPage = () => {
                     Balance:&nbsp;
                 </span>
                 <span className='underline'>
-                        {
-                            isFetching && !balance ? '...' : (stringifyBigInt(balance) + ' TKN')
-                        }
+                    {
+                        !address
+                            ? 'You need to connect your wallet'
+                            : (isFetching && !balance ? '...' : (stringifyBigInt(balance) + ' TKN'))
+
+                    }
                  </span>
             </h2>
-
-            <div className='flex flex-col rounded-md border-2 px-10 py-5 gap-5'>
-                <MintTokensForm/>
-                <BurnTokensForm/>
-            </div>
+            <TokenInputsForm address={address}/>
         </>
     );
 }

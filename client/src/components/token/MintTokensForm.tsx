@@ -14,16 +14,23 @@ import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useTokenStore} from "@/store/useTokenStore.ts";
 import {useToast} from "@/components/ui/use-toast.ts";
+import {ChangeEvent, useState} from "react";
+import {stringifyBigInt} from "@/utils/helpers.ts";
 
 const mintFormSchema = z.object({
-    mintedValue: z.preprocess(n => Number(n), z.number().positive())
+    mintedValue: z.preprocess(n => Number(n), z.number().positive().max(999999999999999))
 })
 
-export const MintTokensForm = () => {
-    const {toast} = useToast()
-    const {mint} = useTokenStore((state) => ({
-        mint: state.mint,
+interface MintTokensFormProps {
+    disabled: boolean
+}
 
+export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
+    const {toast} = useToast()
+    const [mintReward, setMintReward] = useState<bigint>()
+    const {mint, getMintReward} = useTokenStore((state) => ({
+        mint: state.mint,
+        getMintReward: state.getMintReward,
     }))
 
     const mintForm = useForm<z.infer<typeof mintFormSchema>>({
@@ -42,6 +49,24 @@ export const MintTokensForm = () => {
         })
     }
 
+    const onMintValueChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value
+        if (!value) {
+            setMintReward(undefined)
+            mintForm.reset()
+            return
+        }
+
+        if (!+value) {
+            setMintReward(undefined)
+            return
+        }
+
+        const converted = BigInt(+value * 1e18)
+        getMintReward(converted).then((r) => {
+            setMintReward(r)
+        })
+    }
 
     return (
         <Form {...mintForm}>
@@ -55,11 +80,22 @@ export const MintTokensForm = () => {
                             <FormLabel>To mint tokens</FormLabel>
                             <div className='flex w-full max-w-sm items-center space-x-2'>
                                 <FormControl>
-                                    <Input placeholder="USDT" {...field} />
+                                    <Input placeholder="USDT"
+                                           {...field}
+                                           onChange={(e) => {
+                                               field.onChange(e)
+                                               onMintValueChange(e)
+                                           }}
+                                    />
                                 </FormControl>
-                                <Button type="submit">Mint</Button>
+                                <Button disabled={disabled} type="submit">Mint</Button>
                             </div>
                             <FormDescription>
+                                {
+                                    field.value && !mintForm.formState.errors.mintedValue
+                                        ? `You will gain ${stringifyBigInt(mintReward)} tokens`
+                                        : ''
+                                }
                             </FormDescription>
                             <FormMessage/>
                         </FormItem>
