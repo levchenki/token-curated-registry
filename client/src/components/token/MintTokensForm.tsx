@@ -41,7 +41,7 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
     })
 
     const onMintFormSubmit = async (values: z.infer<typeof mintFormSchema>) => {
-        const converted = BigInt(values.mintedValue * 1e18)
+        const converted = BigInt(values.mintedValue) * BigInt(1e18)
         await mint(converted)
         toast({
             title: 'Minted',
@@ -50,19 +50,30 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
     }
 
     const onMintValueChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const maxValue = 999999999999999;
         const value = e.target.value
         if (!value) {
             setMintReward(undefined)
             mintForm.reset()
             return
+
         }
 
         if (!+value) {
             setMintReward(undefined)
             return
+
         }
 
-        const converted = BigInt(+value * 1e18)
+        if (+value > maxValue) {
+            mintForm.setError('mintedValue', {
+                type: 'max',
+                message: 'Value must be less than 999999999999999'
+            })
+            return
+        }
+
+        const converted = BigInt(+value) * BigInt(1e18)
         getMintReward(converted).then((r) => {
             setMintReward(r)
         })

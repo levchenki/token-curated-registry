@@ -41,7 +41,7 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
     })
 
     const onBurnFormSubmit = async (values: z.infer<typeof burnFormSchema>) => {
-        const converted = BigInt(values.burnedValue * 1e18)
+        const converted = BigInt(values.burnedValue) * BigInt(1e18)
         await burn(converted)
         toast({
             title: 'Burned',
@@ -50,6 +50,7 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
     }
 
     const onBurnValueChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const maxValue = 999999999999999;
         const value = e.target.value
         if (!value) {
             setBurnReward(undefined)
@@ -62,7 +63,15 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
             return
         }
 
-        const converted = BigInt(+value * 1e18)
+        if (+value > maxValue) {
+            burnForm.setError('burnedValue', {
+                type: 'max',
+                message: 'Value must be less than 999999999999999'
+            })
+            return
+        }
+
+        const converted = BigInt(+value) * BigInt(1e18)
         getBurnRefund(converted).then((r) => {
             setBurnReward(r)
         })
