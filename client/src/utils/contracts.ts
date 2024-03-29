@@ -1,14 +1,13 @@
 import {computed} from "@preact/signals-react";
 import {getContract} from "viem";
 import {tokenABI} from "@/types/abi.ts";
-import {abcTokenAddress} from "@/types/contracts.ts";
 import {$walletClient, publicClient} from "@/utils/clients.ts";
+import {TOKEN_CONTRACT_ADDRESS} from "@/utils/constants.ts";
 
 export const $tokenContract = computed(() => {
-    const contract = getContract({
+    return getContract({
         abi: tokenABI,
-        address: abcTokenAddress,
+        address: TOKEN_CONTRACT_ADDRESS,
         client: {public: publicClient, wallet: $walletClient.value!, chain: publicClient.chain},
     });
-    return contract;
 })

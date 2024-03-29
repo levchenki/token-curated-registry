@@ -15,7 +15,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useTokenStore} from "@/store/useTokenStore.ts";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {ChangeEvent, useState} from "react";
-import {stringifyBigInt} from "@/utils/helpers.ts";
+import {NumberToBigInt, stringifyBigInt} from "@/utils/helpers.ts";
 import {LoaderIcon} from "lucide-react";
 
 const burnFormSchema = z.object({
@@ -43,7 +43,7 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
     })
 
     const onBurnFormSubmit = async (values: z.infer<typeof burnFormSchema>) => {
-        const converted = BigInt(values.burnedValue) * BigInt(1e18)
+        const converted = NumberToBigInt(values.burnedValue)
         await burn(converted)
             .then(() => {
                 toast({
@@ -65,7 +65,6 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
         const value = e.target.value
         if (!value) {
             setBurnReward(undefined)
-            burnForm.reset()
             return
         }
 
@@ -82,7 +81,7 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
             return
         }
 
-        const converted = BigInt(+value) * BigInt(1e18)
+        const converted = NumberToBigInt(+value)
         getBurnRefund(converted).then((r) => {
             setBurnReward(r)
         })
@@ -118,7 +117,7 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
                             </div>
                             <FormDescription>
                                 {
-                                    field.value && !burnForm.formState.errors.burnedValue
+                                    !!+field.value && !burnForm.formState.errors.burnedValue
                                         ? `You will gain ${stringifyBigInt(burnReward)} USDT`
                                         : ''
                                 }

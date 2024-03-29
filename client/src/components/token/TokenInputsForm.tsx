@@ -1,16 +1,52 @@
 import {MintTokensForm} from "@/components/token/MintTokensForm.tsx";
 import {BurnTokensForm} from "@/components/token/BurnTokensForm.tsx";
+import {useTokenStore} from "@/store/useTokenStore.ts";
+import {DepositTokensForm} from "@/components/token/DepositTokensForm.tsx";
+import {useEffect, useState} from "react";
+import {LoaderIcon} from "lucide-react";
 
 
-interface TokenFormProps {
+interface TokenInputsFormProps {
     address: `0x${string}` | undefined
 }
 
-export const TokenInputsForm = ({address}: TokenFormProps) => {
+export const TokenInputsForm = ({address}: TokenInputsFormProps) => {
+    const [isActive, setIsActive] = useState<boolean>()
+    const [isOwner, setIsOwner] = useState<boolean>()
+    const {getIsActivePeriod, getIsOwner} = useTokenStore(state => ({
+        getIsActivePeriod: state.getIsActivePeriod,
+        getIsOwner: state.getIsOwner
+    }))
+
+    useEffect(() => {
+        getIsActivePeriod().then((res) => {
+            setIsActive(res)
+        })
+    }, [getIsActivePeriod]);
+
+    useEffect(() => {
+        getIsOwner(address).then((res) => {
+            setIsOwner(res)
+        })
+    }, [address, getIsOwner]);
+
     return (
         <div className='flex flex-col rounded-md border-2 px-10 py-5 gap-5'>
-            <MintTokensForm disabled={!address}/>
-            <BurnTokensForm disabled={!address}/>
+
+            {
+                isActive === undefined ? <div>
+                        <LoaderIcon className="animate-spin"/>
+                    </div> :
+                    isActive ?
+                        <>
+                            <MintTokensForm disabled={!address}/>
+                            <BurnTokensForm disabled={!address}/>
+                        </>
+
+                        : <>
+                            <DepositTokensForm address={address} isDistributable={isOwner && !isActive}/>
+                        </>
+            }
         </div>
     )
 }

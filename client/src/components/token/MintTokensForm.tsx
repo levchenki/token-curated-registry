@@ -15,7 +15,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {useTokenStore} from "@/store/useTokenStore.ts";
 import {useToast} from "@/components/ui/use-toast.ts";
 import {ChangeEvent, useState} from "react";
-import {stringifyBigInt} from "@/utils/helpers.ts";
+import {NumberToBigInt, stringifyBigInt} from "@/utils/helpers.ts";
 import {LoaderIcon} from "lucide-react";
 
 const mintFormSchema = z.object({
@@ -43,7 +43,7 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
     })
 
     const onMintFormSubmit = async (values: z.infer<typeof mintFormSchema>) => {
-        const converted = BigInt(values.mintedValue) * BigInt(1e18)
+        const converted = NumberToBigInt(values.mintedValue)
         await mint(converted)
             .then(() => {
                 toast({
@@ -65,15 +65,12 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
         const value = e.target.value
         if (!value) {
             setMintReward(undefined)
-            mintForm.reset()
             return
-
         }
 
         if (!+value) {
             setMintReward(undefined)
             return
-
         }
 
         if (+value > maxValue) {
@@ -84,7 +81,7 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
             return
         }
 
-        const converted = BigInt(+value) * BigInt(1e18)
+        const converted = NumberToBigInt(+value)
         getMintReward(converted).then((r) => {
             setMintReward(r)
         })
@@ -120,7 +117,7 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
                             </div>
                             <FormDescription>
                                 {
-                                    field.value && !mintForm.formState.errors.mintedValue
+                                    !!+field.value && !mintForm.formState.errors.mintedValue
                                         ? `You will gain ${stringifyBigInt(mintReward)} tokens`
                                         : ''
                                 }

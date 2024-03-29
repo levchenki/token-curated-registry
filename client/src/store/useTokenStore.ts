@@ -8,10 +8,16 @@ interface BalanceStore {
     isMinting: boolean
     isBurning: boolean
 
-    mint: (amount: bigint) => Promise<void>
     burn: (amount: bigint) => Promise<void>
+    deposit: (amount: bigint) => Promise<void>
+    distribute: (from: `0x${string}` | undefined, isActive: boolean | undefined) => Promise<void>
+    mint: (amount: bigint) => Promise<void>
+
     getMintReward: (amount: bigint) => Promise<bigint>
     getBurnRefund: (amount: bigint) => Promise<bigint>
+
+    getIsActivePeriod: () => Promise<boolean>
+    getIsOwner: (address: `0x${string}` | undefined) => Promise<boolean>
 }
 
 export const useTokenStore = createWithEqualityFn<BalanceStore>()(
@@ -27,6 +33,7 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
                 if (!account) {
                     return
                 }
+
                 console.log(amount)
                 await tokenContract.write.burn([amount], {account: account.address, chain})
                     .finally(() => {
@@ -42,7 +49,23 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
                     return
                 }
 
+                console.log(amount)
                 await tokenContract.write.deposit([amount], {account: account.address, chain})
+            },
+            distribute: async (from: `0x${string}` | undefined, isDistributable: boolean | undefined) => {
+                const tokenContract = $tokenContract.peek()
+                if (!from || !isDistributable) {
+                    return
+                }
+                const accumulationDateEndEpoch = await tokenContract.read.accumulationDateEnd()
+                const accumulationDateEnd = new Date(Number(accumulationDateEndEpoch) * 1000);
+                if (accumulationDateEnd > new Date()) {
+                    throw new Error(
+                        `You will be able to distribute after the accumulation period ends. 
+                         Please wait until ${accumulationDateEnd.toDateString()}`
+                    )
+                }
+                await tokenContract.write.distribute({account: from, chain: $chain.peek()})
             },
             mint: async (amount: bigint) => {
                 set({isMinting: true})
@@ -53,6 +76,7 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
                 if (!account) {
                     return
                 }
+
                 console.log(amount)
                 await tokenContract.write.mint([amount], {account: account.address, chain})
                     .finally(() => {
@@ -67,6 +91,17 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
                 const tokenContract = $tokenContract.peek()
                 return await tokenContract.read.getContinuousBurnRefund([amount])
             },
+            getIsActivePeriod: async () => {
+                const tokenContract = $tokenContract.peek()
+                return await tokenContract.read.isActive()
+            },
+            getIsOwner: async (address: `0x${string}` | undefined) => {
+                if (!address) {
+                    return false
+                }
+                const tokenContract = $tokenContract.peek()
+                return await tokenContract.read.owner() === address
+            }
         }),
         {
             name: 'token'
