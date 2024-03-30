@@ -8,6 +8,10 @@ interface BalanceStore {
     isMinting: boolean
     isBurning: boolean
 
+    isFetchingBalance: boolean
+    balance?: bigint
+    getBalance: (address: `0x${string}` | undefined) => Promise<void>
+
     burn: (amount: bigint) => Promise<void>
     deposit: (amount: bigint) => Promise<void>
     distribute: (from: `0x${string}` | undefined, isActive: boolean | undefined) => Promise<void>
@@ -25,6 +29,25 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
         (set) => ({
             isMinting: false,
             isBurning: false,
+
+            isFetchingBalance: false,
+            balance: undefined,
+
+            getBalance: async (address: `0x${string}` | undefined) => {
+                const tokenContract = $tokenContract.peek()
+
+                if (!address) {
+                    return
+                }
+
+                set({isFetchingBalance: true})
+
+                const balanceOf = await tokenContract.read.balanceOf([address])
+
+                set({balance: BigInt(balanceOf)})
+                set({isFetchingBalance: false})
+            },
+
             burn: async (amount: bigint) => {
                 set({isBurning: true})
                 const tokenContract = $tokenContract.peek()
@@ -104,7 +127,11 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
             }
         }),
         {
-            name: 'token'
+            name: 'token',
+            partialize: (state) =>
+                Object.fromEntries(
+                    Object.entries(state).filter(([key]) => !['balance'].includes(key)),
+                ),
         }
     )
 )

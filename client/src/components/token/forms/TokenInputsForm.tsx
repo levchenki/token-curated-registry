@@ -1,7 +1,7 @@
-import {MintTokensForm} from "@/components/token/MintTokensForm.tsx";
-import {BurnTokensForm} from "@/components/token/BurnTokensForm.tsx";
+import {MintTokensForm} from "@/components/token/forms/MintTokensForm.tsx";
+import {BurnTokensForm} from "@/components/token/forms/BurnTokensForm.tsx";
 import {useTokenStore} from "@/store/useTokenStore.ts";
-import {DepositTokensForm} from "@/components/token/DepositTokensForm.tsx";
+import {DepositTokensForm} from "@/components/token/forms/DepositTokensForm.tsx";
 import {useEffect, useState} from "react";
 import {LoaderIcon} from "lucide-react";
 

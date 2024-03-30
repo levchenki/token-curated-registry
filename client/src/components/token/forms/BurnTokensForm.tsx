@@ -28,7 +28,7 @@ interface BurnTokensFormProps {
 
 export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
     const {toast} = useToast()
-    const [burnReward, setBurnReward] = useState<bigint>()
+    const [burnRefund, setBurnRefund] = useState<bigint>()
     const {burn, getBurnRefund, isBurning} = useTokenStore((state) => ({
         burn: state.burn,
         getBurnRefund: state.getBurnRefund,
@@ -64,12 +64,12 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
         const maxValue = 999999999999999;
         const value = e.target.value
         if (!value) {
-            setBurnReward(undefined)
+            setBurnRefund(undefined)
             return
         }
 
-        if (!+value) {
-            setBurnReward(undefined)
+        if (!+value || +value <= 0) {
+            setBurnRefund(undefined)
             return
         }
 
@@ -83,7 +83,7 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
 
         const converted = NumberToBigInt(+value)
         getBurnRefund(converted).then((r) => {
-            setBurnReward(r)
+            setBurnRefund(r)
         })
     }
 
@@ -117,8 +117,8 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
                             </div>
                             <FormDescription>
                                 {
-                                    !!+field.value && !burnForm.formState.errors.burnedValue
-                                        ? `You will gain ${stringifyBigInt(burnReward)} USDT`
+                                    burnRefund
+                                        ? `You will gain ${stringifyBigInt(burnRefund)} USDT`
                                         : ''
                                 }
                             </FormDescription>

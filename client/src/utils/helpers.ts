@@ -1,7 +1,7 @@
 import Big from 'big.js';
 
 export const stringifyBigInt = (num: bigint | undefined): string => {
-    if (!num) {
+    if (num === undefined) {
         return '...'
     }
 

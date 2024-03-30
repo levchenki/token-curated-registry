@@ -68,7 +68,7 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
             return
         }
 
-        if (!+value) {
+        if (!+value || +value <= 0) {
             setMintReward(undefined)
             return
         }
@@ -117,7 +117,7 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
                             </div>
                             <FormDescription>
                                 {
-                                    !!+field.value && !mintForm.formState.errors.mintedValue
+                                    mintReward
                                         ? `You will gain ${stringifyBigInt(mintReward)} tokens`
                                         : ''
                                 }
