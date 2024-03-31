@@ -26,7 +26,7 @@ interface BurnTokensFormProps {
     disabled: boolean
 }
 
-export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
+export const InputBurnForm = ({disabled}: BurnTokensFormProps) => {
     const {toast} = useToast()
     const [burnRefund, setBurnRefund] = useState<bigint>()
     const {burn, getBurnRefund, isBurning, balance} = useTokenStore((state) => ({

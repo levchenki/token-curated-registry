@@ -1,17 +1,17 @@
-import {MintTokensForm} from "@/components/token/forms/MintTokensForm.tsx";
-import {BurnTokensForm} from "@/components/token/forms/BurnTokensForm.tsx";
+import {InputMintForm} from "@/components/token/forms/InputMintForm.tsx";
+import {InputBurnForm} from "@/components/token/forms/InputBurnForm.tsx";
 import {useTokenStore} from "@/store/useTokenStore.ts";
-import {DepositTokensForm} from "@/components/token/forms/DepositTokensForm.tsx";
 import {useEffect, useState} from "react";
 import {LoaderIcon} from "lucide-react";
-import {DepositsList} from "@/components/token/forms/DepositsList.tsx";
+import {DepositList} from "@/components/token/deposit-list/DepositList.tsx";
+import {InputDepositForm} from "@/components/token/forms/InputDepositForm.tsx";
 
 
 interface TokenInputsFormProps {
     address: `0x${string}` | undefined
 }
 
-export const TokenInputsForm = ({address}: TokenInputsFormProps) => {
+export const TokenForm = ({address}: TokenInputsFormProps) => {
     const [isActive, setIsActive] = useState<boolean>()
     const [isOwner, setIsOwner] = useState<boolean>()
     const {getIsActivePeriod, getIsOwner} = useTokenStore(state => ({
@@ -41,17 +41,17 @@ export const TokenInputsForm = ({address}: TokenInputsFormProps) => {
                         </div> :
                         isActive ?
                             <>
-                                <MintTokensForm disabled={!address}/>
-                                <BurnTokensForm disabled={!address}/>
+                                <InputMintForm disabled={!address}/>
+                                <InputBurnForm disabled={!address}/>
                             </>
 
                             : <>
-                                <DepositTokensForm address={address} isDistributable={isOwner && !isActive}/>
+                                <InputDepositForm address={address} isDistributable={isOwner && !isActive}/>
                             </>
                 }
             </div>
             {
-                !isActive && <DepositsList/>
+                !isActive && <DepositList/>
             }
         </>
     )

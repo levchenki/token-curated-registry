@@ -25,7 +25,7 @@ interface DepositTokensFormProps {
     isDistributable?: boolean
 }
 
-export const DepositTokensForm = ({address, isDistributable}: DepositTokensFormProps) => {
+export const InputDepositForm = ({address, isDistributable}: DepositTokensFormProps) => {
     const {toast} = useToast()
     const {deposit, distribute} = useTokenStore((state) => ({
         deposit: state.deposit,

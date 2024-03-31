@@ -26,7 +26,7 @@ interface MintTokensFormProps {
     disabled: boolean
 }
 
-export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
+export const InputMintForm = ({disabled}: MintTokensFormProps) => {
     const {toast} = useToast()
     const [mintReward, setMintReward] = useState<bigint>()
     const {mint, getMintReward, isMinting} = useTokenStore((state) => ({
