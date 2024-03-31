@@ -1,6 +1,6 @@
 import Big from 'big.js';
 
-export const stringifyBigInt = (num: bigint | undefined): string => {
+export const stringifyBigInt = (num: bigint | undefined, isToFixed = false): string => {
     if (num === undefined) {
         return '...'
     }
@@ -12,18 +12,26 @@ export const stringifyBigInt = (num: bigint | undefined): string => {
     const decimals = 18
     const numStr = num.toString()
     const len = numStr.length
-
+    const toFixed = 4
     if (len <= decimals) {
-        return `0.${'0'.repeat(decimals - len)}${numStr}`
+        const decimalStr = `0.${'0'.repeat(decimals - len)}${numStr}`;
+        return isToFixed ? parseFloat(decimalStr).toFixed(toFixed) : parseFloat(decimalStr).toString()
     }
 
     const integer = numStr.slice(0, len - decimals) || '0'
     const fraction = numStr.slice(len - decimals)
-    return `${integer}.${fraction.slice(0, 4)}`
+    return `${integer}.${fraction.slice(0, toFixed)}`
 }
 
 export const NumberToBigInt = (num: number): bigint => {
     const bigNum = new Big(num);
     const multiplied = bigNum.times(Big(10).pow(18));
     return BigInt(multiplied.toFixed(0));
+}
+
+export const shortenAddress = (address: `0x${string}` | undefined): string => {
+    if (!address) {
+        return '...'
+    }
+    return `${address.slice(0, 6)}...${address.slice(-4)}`
 }

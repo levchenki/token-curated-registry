@@ -58,6 +58,10 @@ export const MintTokensForm = ({disabled}: MintTokensFormProps) => {
                     description: e.message
                 })
             })
+            .finally(() => {
+                mintForm.reset()
+                setMintReward(undefined)
+            })
     }
 
     const onMintValueChange = (e: ChangeEvent<HTMLInputElement>) => {

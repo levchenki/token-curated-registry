@@ -4,6 +4,7 @@ import {useTokenStore} from "@/store/useTokenStore.ts";
 import {DepositTokensForm} from "@/components/token/forms/DepositTokensForm.tsx";
 import {useEffect, useState} from "react";
 import {LoaderIcon} from "lucide-react";
+import {DepositsList} from "@/components/token/forms/DepositsList.tsx";
 
 
 interface TokenInputsFormProps {
@@ -31,22 +32,27 @@ export const TokenInputsForm = ({address}: TokenInputsFormProps) => {
     }, [address, getIsOwner]);
 
     return (
-        <div className='flex flex-col rounded-md border-2 px-10 py-5 gap-5'>
+        <>
+            <div className='flex flex-col rounded-md border-2 px-10 py-5 gap-5'>
 
+                {
+                    isActive === undefined ? <div>
+                            <LoaderIcon className="animate-spin"/>
+                        </div> :
+                        isActive ?
+                            <>
+                                <MintTokensForm disabled={!address}/>
+                                <BurnTokensForm disabled={!address}/>
+                            </>
+
+                            : <>
+                                <DepositTokensForm address={address} isDistributable={isOwner && !isActive}/>
+                            </>
+                }
+            </div>
             {
-                isActive === undefined ? <div>
-                        <LoaderIcon className="animate-spin"/>
-                    </div> :
-                    isActive ?
-                        <>
-                            <MintTokensForm disabled={!address}/>
-                            <BurnTokensForm disabled={!address}/>
-                        </>
-
-                        : <>
-                            <DepositTokensForm address={address} isDistributable={isOwner && !isActive}/>
-                        </>
+                !isActive && <DepositsList/>
             }
-        </div>
+        </>
     )
 }

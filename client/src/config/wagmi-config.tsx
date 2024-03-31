@@ -12,10 +12,12 @@ const metadata = {
     icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
+const sepoliaTransport = http(`https://sepolia.infura.io/v3/${import.meta.env.VITE_INFURA_API_KEY}`)
+
 export const wagmiConfig = createConfig({
     chains: [sepolia],
     transports: {
-        [sepolia.id]: http(),
+        [sepolia.id]: sepoliaTransport,
     },
     connectors: [
         walletConnect({projectId, metadata, showQrModal: false}),

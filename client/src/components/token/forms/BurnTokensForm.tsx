@@ -29,10 +29,11 @@ interface BurnTokensFormProps {
 export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
     const {toast} = useToast()
     const [burnRefund, setBurnRefund] = useState<bigint>()
-    const {burn, getBurnRefund, isBurning} = useTokenStore((state) => ({
+    const {burn, getBurnRefund, isBurning, balance} = useTokenStore((state) => ({
         burn: state.burn,
         getBurnRefund: state.getBurnRefund,
         isBurning: state.isBurning,
+        balance: state.balance
     }))
 
     const burnForm = useForm<z.infer<typeof burnFormSchema>>({
@@ -44,6 +45,16 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
 
     const onBurnFormSubmit = async (values: z.infer<typeof burnFormSchema>) => {
         const converted = NumberToBigInt(values.burnedValue)
+
+        if (balance && converted > balance) {
+            toast({
+                title: 'Error',
+                variant: 'destructive',
+                description: 'Not enough balance'
+            })
+            return
+        }
+
         await burn(converted)
             .then(() => {
                 toast({
@@ -57,6 +68,10 @@ export const BurnTokensForm = ({disabled}: BurnTokensFormProps) => {
                     variant: 'destructive',
                     description: e.message
                 })
+            })
+            .finally(() => {
+                burnForm.reset()
+                setBurnRefund(undefined)
             })
     }
 

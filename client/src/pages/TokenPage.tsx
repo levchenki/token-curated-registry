@@ -19,7 +19,7 @@ export const TokenPage = () => {
         balance,
         isFetchingBalance,
         getBalance,
-        listenBalance
+        listenBalance,
     } = useTokenStore(state => ({
         balance: state.balance,
         isFetchingBalance: state.isFetchingBalance,

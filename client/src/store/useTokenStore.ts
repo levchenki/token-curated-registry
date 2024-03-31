@@ -2,6 +2,7 @@ import {createWithEqualityFn} from "zustand/traditional";
 import {persist} from "zustand/middleware";
 import {$account, $chain} from "@/utils/clients.ts";
 import {$tokenContract} from "@/utils/contracts.ts";
+import {DepositEvent} from "@/types/interfaces.ts";
 
 
 interface BalanceStore {
@@ -25,6 +26,12 @@ interface BalanceStore {
 
     isListeningBalance: boolean
     listenBalance: (address: `0x${string}` | undefined) => Promise<void>
+
+    isFetchingDeposits: boolean
+    deposits: DepositEvent[]
+    getDeposits: () => Promise<void>
+    isListeningDeposits: boolean
+    listenDeposits: () => Promise<void>
 }
 
 export const useTokenStore = createWithEqualityFn<BalanceStore>()(
@@ -47,8 +54,7 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
 
                 const balanceOf = await tokenContract.read.balanceOf([address])
 
-                set({balance: BigInt(balanceOf)})
-                set({isFetchingBalance: false})
+                set({balance: BigInt(balanceOf), isFetchingBalance: false})
             },
 
             burn: async (amount: bigint) => {
@@ -140,9 +146,7 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
 
                 tokenContract.watchEvent.Transfer({}, {
                     onLogs: (logs) => {
-                        console.log(logs)
                         logs.map((log) => {
-                            console.log(log)
                             const {from, to, value} = log.args
                             if (!from || !to || !value) {
                                 return
@@ -165,13 +169,56 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
                     }
                 })
             },
+
+            isFetchingDeposits: false,
+            deposits: [],
+            getDeposits: async () => {
+                const tokenContract = $tokenContract.peek()
+                set({isFetchingDeposits: true})
+                const depositedEvents = await tokenContract.getEvents.Deposited({fromBlock: 1n})
+                const deposits = depositedEvents.map(d => {
+                    const address = d.address
+                    const transactionHash = d.transactionHash
+                    const {amount, sender} = d.args
+                    return {address, transactionHash, amount, sender}
+                })
+                deposits.reverse()
+                set({deposits, isFetchingDeposits: false})
+            },
+            isListeningDeposits: false,
+            listenDeposits: async () => {
+                if (get().isListeningDeposits) {
+                    return
+                }
+                console.log('listening deposits')
+                set({isListeningDeposits: true})
+                const tokenContract = $tokenContract.peek()
+
+                tokenContract.watchEvent.Deposited({
+                    onLogs: (logs) => {
+                        const newDeposits = logs.map((log) => {
+                            const {amount, sender} = log.args
+
+                            return {
+                                address: log.address,
+                                transactionHash: log.transactionHash,
+                                amount,
+                                sender
+                            }
+                        })
+                        set((state) => {
+                            return {deposits: [...newDeposits, ...state.deposits]}
+                        })
+                    }
+                })
+            }
         }),
         {
             name: 'token',
             partialize: (state) =>
                 Object.fromEntries(
                     Object.entries(state).filter(([key]) => {
-                        return !['balance', 'isListeningBalance'].includes(key);
+                        return !['balance', 'isListeningBalance', 'deposits', 'isListeningDeposits'].includes(key);
                     }),
                 ),
         }
