@@ -33,8 +33,7 @@ export const TokenForm = ({address}: TokenInputsFormProps) => {
 
     return (
         <>
-            <div className='flex flex-col rounded-md border-2 px-10 py-5 gap-5'>
-
+            <div className='flex flex-col rounded-md border-2 px-10 py-5 gap-5 w-72 md:w-fit'>
                 {
                     isActive === undefined ? <div>
                             <LoaderIcon className="animate-spin"/>

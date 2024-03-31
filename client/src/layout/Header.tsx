@@ -10,7 +10,7 @@ export const Header = () => {
             <h2 className='md:text-start text-center scroll-m-20 pb-2 text-2xl font-semibold tracking-tight first:mt-0'>
                 Token Curated Registry
             </h2>
-            <div className='flex flex-row items-center gap-10 justify-center'>
+            <div className='flex flex-row items-center gap-3 justify-center'>
                 <Link to='registry'>
                     <Button className='font-semibold' variant='link'>
                         Registry
