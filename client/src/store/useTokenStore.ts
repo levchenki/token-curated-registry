@@ -22,11 +22,14 @@ interface BalanceStore {
 
     getIsActivePeriod: () => Promise<boolean>
     getIsOwner: (address: `0x${string}` | undefined) => Promise<boolean>
+
+    isListeningBalance: boolean
+    listenBalance: (address: `0x${string}` | undefined) => Promise<void>
 }
 
 export const useTokenStore = createWithEqualityFn<BalanceStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             isMinting: false,
             isBurning: false,
 
@@ -124,13 +127,52 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
                 }
                 const tokenContract = $tokenContract.peek()
                 return await tokenContract.read.owner() === address
-            }
+            },
+
+            isListeningBalance: false,
+            listenBalance: async (address: `0x${string}` | undefined) => {
+                if (!address || get().isListeningBalance) {
+                    return
+                }
+                console.log('listening balance')
+                set({isListeningBalance: true})
+                const tokenContract = $tokenContract.peek()
+
+                tokenContract.watchEvent.Transfer({}, {
+                    onLogs: (logs) => {
+                        console.log(logs)
+                        logs.map((log) => {
+                            console.log(log)
+                            const {from, to, value} = log.args
+                            if (!from || !to || !value) {
+                                return
+                            }
+
+                            if (from === address) {
+                                const diff = BigInt(value)
+                                set((state) => {
+                                    return {balance: state.balance ? state.balance - diff : state.balance}
+                                })
+                            }
+
+                            if (to === address) {
+                                const diff = BigInt(value)
+                                set((state) => {
+                                    return {balance: state.balance ? state.balance + diff : state.balance}
+                                })
+                            }
+                        })
+                    }
+                })
+            },
         }),
         {
             name: 'token',
             partialize: (state) =>
                 Object.fromEntries(
-                    Object.entries(state).filter(([key]) => !['balance'].includes(key)),
+                    Object.entries(state).filter(([key]) => {
+                        return !['balance', 'isListeningBalance'].includes(key);
+                    }),
                 ),
         }
     )

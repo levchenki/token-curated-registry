@@ -15,10 +15,16 @@ import {LoaderIcon} from "lucide-react";
 export const TokenPage = () => {
     const {toast} = useToast()
     const {address} = useAccount()
-    const {balance, isFetchingBalance, getBalance} = useTokenStore(state => ({
+    const {
+        balance,
+        isFetchingBalance,
+        getBalance,
+        listenBalance
+    } = useTokenStore(state => ({
         balance: state.balance,
         isFetchingBalance: state.isFetchingBalance,
-        getBalance: state.getBalance
+        getBalance: state.getBalance,
+        listenBalance: state.listenBalance,
     }))
 
 
@@ -30,7 +36,21 @@ export const TokenPage = () => {
             })
             console.log(e)
         })
-    }, [toast, address, getBalance]);
+    }, [toast, address, getBalance])
+
+
+    useEffect(() => {
+        if (!address) {
+            return
+        }
+        listenBalance(address)
+            .catch(e => {
+                toast({
+                    title: 'Error',
+                    description: e.message,
+                })
+            })
+    }, [toast, address, listenBalance])
 
     const tokenContractAddress = SEPOLIA_ETHERSCAN_URL + `address/${TOKEN_CONTRACT_ADDRESS}`
     return (
