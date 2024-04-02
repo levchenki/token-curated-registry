@@ -67,6 +67,7 @@ export const InputMintForm = ({disabled}: MintTokensFormProps) => {
     const onMintValueChange = (e: ChangeEvent<HTMLInputElement>) => {
         const maxValue = 999999999999999;
         const value = e.target.value
+        mintForm.clearErrors('mintedValue')
         if (!value) {
             setMintReward(undefined)
             return

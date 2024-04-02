@@ -78,6 +78,7 @@ export const InputBurnForm = ({disabled}: BurnTokensFormProps) => {
     const onBurnValueChange = (e: ChangeEvent<HTMLInputElement>) => {
         const maxValue = 999999999999999;
         const value = e.target.value
+        burnForm.clearErrors('burnedValue')
         if (!value) {
             setBurnRefund(undefined)
             return
@@ -97,6 +98,14 @@ export const InputBurnForm = ({disabled}: BurnTokensFormProps) => {
         }
 
         const converted = NumberToBigInt(+value)
+        if (balance && converted > balance) {
+            burnForm.setError('burnedValue', {
+                type: 'max',
+                message: 'Value must be less than balance'
+            })
+            return
+        }
+
         getBurnRefund(converted).then((r) => {
             setBurnRefund(r)
         })

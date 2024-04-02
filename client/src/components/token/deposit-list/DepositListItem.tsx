@@ -3,10 +3,10 @@ import {shortenAddress, stringifyBigInt} from "@/utils/helpers.ts";
 import {Link} from "react-router-dom";
 import {SEPOLIA_ETHERSCAN_URL} from "@/utils/constants.ts";
 import {SquareArrowOutUpRight} from "lucide-react";
-import {DepositEvent} from "@/types/interfaces.ts";
+import {IDepositEvent} from "@/types/interfaces.ts";
 
 interface DepositsListItemProps {
-    deposit: DepositEvent
+    deposit: IDepositEvent
 }
 
 export const DepositListItem = ({deposit}: DepositsListItemProps) => {

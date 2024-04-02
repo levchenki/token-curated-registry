@@ -50,7 +50,7 @@ export const TokenForm = ({address}: TokenInputsFormProps) => {
                 }
             </div>
             {
-                !isActive && <DepositList/>
+                !isActive ? <DepositList/> : null
             }
         </>
     )

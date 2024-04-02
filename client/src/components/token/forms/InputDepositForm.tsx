@@ -91,6 +91,7 @@ export const InputDepositForm = ({address, isDistributable}: DepositTokensFormPr
                                                {...field}
                                                onChange={(e) => {
                                                    field.onChange(e)
+                                                   depositForm.clearErrors('depositedValue')
                                                }}
                                         />
                                     </FormControl>

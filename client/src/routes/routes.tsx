@@ -1,7 +1,7 @@
 import React from "react";
-import {RegistryPage} from "@/pages/RegistryPage.tsx";
-import {VotingPage} from "@/pages/VotingPage.tsx";
-import {TokenPage} from "@/pages/TokenPage.tsx";
+import {RegistryPage} from "@/pages/registry/RegistryPage.tsx";
+import {VotingPage} from "@/pages/voting/VotingPage.tsx";
+import {TokenPage} from "@/pages/token/TokenPage.tsx";
 
 interface IRoutes {
     path: RoutePaths,

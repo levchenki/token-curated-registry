@@ -2,7 +2,7 @@ import {createWithEqualityFn} from "zustand/traditional";
 import {persist} from "zustand/middleware";
 import {$account, $chain} from "@/utils/clients.ts";
 import {$tokenContract} from "@/utils/contracts.ts";
-import {DepositEvent} from "@/types/interfaces.ts";
+import {IDepositEvent} from "@/types/interfaces.ts";
 
 
 interface BalanceStore {
@@ -28,7 +28,7 @@ interface BalanceStore {
     listenBalance: (address: `0x${string}` | undefined) => Promise<void>
 
     isFetchingDeposits: boolean
-    deposits: DepositEvent[]
+    deposits: IDepositEvent[]
     getDeposits: () => Promise<void>
     isListeningDeposits: boolean
     listenDeposits: () => Promise<void>
