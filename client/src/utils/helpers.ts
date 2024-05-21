@@ -1,4 +1,5 @@
 import Big from 'big.js';
+import {SEPOLIA_ETHERSCAN_URL} from "@/utils/constants.ts";
 
 export const stringifyBigInt = (num: bigint | undefined, isToFixed = false): string => {
     if (num === undefined) {
@@ -34,4 +35,11 @@ export const shortenAddress = (address: `0x${string}` | undefined): string => {
         return '...'
     }
     return `${address.slice(0, 6)}...${address.slice(-4)}`
+}
+
+export const getEtherscanAddressLink = (address: `0x${string}`): string => {
+    if (!address) {
+        return ''
+    }
+    return `${SEPOLIA_ETHERSCAN_URL}/address/${address}`
 }

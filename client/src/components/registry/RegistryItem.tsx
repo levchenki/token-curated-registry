@@ -2,7 +2,7 @@ import {Separator} from "@/components/ui/separator.tsx";
 import {ExternalLink, Link as LinkIcon, Trash2} from "lucide-react";
 import {IRegistryItem} from "@/types/interfaces.ts";
 import {Link} from "react-router-dom";
-import {SEPOLIA_ETHERSCAN_URL} from "@/utils/constants.ts";
+import {getEtherscanAddressLink} from "@/utils/helpers.ts";
 
 
 interface RegistryItemProps {
@@ -24,7 +24,7 @@ export const RegistryItem = ({registry}: RegistryItemProps) => {
             <div className='flex flex-col w-full text-center items-center'>
                 <Separator/>
                 <div className='grid grid-cols-2 w-full pt-3 px-2'>
-                    <Link to={`${SEPOLIA_ETHERSCAN_URL}address/${registry.address}`}
+                    <Link to={getEtherscanAddressLink(registry.address)}
                           target='_blank'
                           className='w-fit'>
                         <ExternalLink

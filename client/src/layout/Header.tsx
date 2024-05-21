@@ -21,6 +21,11 @@ export const Header = () => {
                         Voting
                     </Button>
                 </Link>
+                <Link to='applications'>
+                    <Button className='font-semibold' variant='link'>
+                        Applications
+                    </Button>
+                </Link>
                 <Link to='token'>
                     <Button className='font-semibold' variant='link'>
                         Token
