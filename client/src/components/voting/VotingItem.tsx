@@ -1,8 +1,8 @@
 import {IVotingItem} from "@/types/interfaces.ts";
 import {Link} from "react-router-dom";
-import {Button} from "@/components/ui/button.tsx";
 import {getEtherscanAddressLink, shortenAddress, stringifyBigInt} from "@/utils/helpers.ts";
 import {ExternalLink, Link as LinkIcon} from "lucide-react";
+import {VotingDialogButton} from "@/components/voting/VotingDialogButton.tsx";
 
 interface IVotingItemProps {
     votingItem: IVotingItem;
@@ -72,16 +72,8 @@ export const VotingItem = ({votingItem, address}: IVotingItemProps) => {
                     <p>End at: </p>
                     <p className='underline'>{votingItem.endDate.toLocaleString()}</p>
                 </div>
-                <div className='grid grid-cols-2 gap-2 self-end'>
-                    <Button variant='outline' disabled={isDisabled(votingItem)}
-                            className='hover:bg-primary hover:text-accent' size='sm'>
-                        Approve
-                    </Button>
-                    <Button variant='outline' disabled={isDisabled(votingItem)}
-                            className='hover:bg-destructive hover:text-accent'
-                            size='sm'>
-                        Deny
-                    </Button>
+                <div className='flex flex-col gap-2 self-end'>
+                    <VotingDialogButton isDisabled={isDisabled(votingItem)} votingItem={votingItem}/>
                 </div>
             </div>
         </div>
