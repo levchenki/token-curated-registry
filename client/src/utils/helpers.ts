@@ -43,3 +43,12 @@ export const getEtherscanAddressLink = (address: `0x${string}`): string => {
     }
     return `${SEPOLIA_ETHERSCAN_URL}/address/${address}`
 }
+
+export const isValidURL = (url: string) => {
+    try {
+        new URL(url);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}

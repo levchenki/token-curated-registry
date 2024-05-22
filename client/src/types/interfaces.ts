@@ -16,7 +16,7 @@ export interface IRegistryItem {
 }
 
 
-export type ApplicationStatus = 'OPEN' | 'CLOSED'
+export type ApplicationStatus = 'OPEN' | 'CHALLENGING' |'CLOSED'
 
 export interface IApplicationItem {
     address: `0x${string}`
@@ -29,7 +29,7 @@ export interface IApplicationItem {
 }
 
 export type VotingStatus = 'ACTIVE' | 'APPROVED' | 'DENIED'
-export type VotingType = 'APPLICATION' | 'MEMBERSHIP'
+export type VotingReason = 'APPLICATION' | 'MEMBERSHIP'
 
 export interface IVotingItem {
     address: `0x${string}`
@@ -40,5 +40,5 @@ export interface IVotingItem {
     startDate: Date,
     endDate: Date,
     initiator: `0x${string}`
-    votingType: VotingType
+    votingReason: VotingReason
 }

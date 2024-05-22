@@ -1,16 +1,11 @@
-import {IVotingItem} from "@/types/interfaces.ts";
+import {IApplicationItem, IVotingItem, VotingReason} from "@/types/interfaces.ts";
 import {create} from "zustand";
 
 interface IVotingStore {
     isLoaded: boolean,
     votingList: IVotingItem[],
     getVotingList: () => Promise<void>,
-    // addNewVoting: (address: `0x${string}`,
-    //                     name: string,
-    //                     link: string,
-    //                     deposit: bigint * BigInt1e18,
-    //                     initiator: `0x${string}`,
-    //                     votingType: VotingType) => Promise<void>
+    addNewVoting: (application: IApplicationItem, initiator: `0x${string}`, reason: VotingReason) => Promise<void>
 }
 
 export const useVotingStore = create<IVotingStore>((set, get) => ({
@@ -30,7 +25,7 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                         startDate: new Date(),
                         endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
                         initiator: '0x1234567890',
-                        votingType: 'APPLICATION'
+                        votingReason: 'APPLICATION'
                     },
                     {
                         address: '0x0987654321',
@@ -41,7 +36,7 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14),
                         endDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
                         initiator: '0x1234567890',
-                        votingType: 'MEMBERSHIP'
+                        votingReason: 'MEMBERSHIP'
                     },
                     {
                         address: '0x1357924680',
@@ -52,7 +47,7 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14),
                         endDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
                         initiator: '0x1234567890',
-                        votingType: 'APPLICATION'
+                        votingReason: 'APPLICATION'
                     },
                     {
                         address: '0x2468135790',
@@ -63,7 +58,7 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6),
                         endDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
                         initiator: '0x1234567890',
-                        votingType: 'MEMBERSHIP'
+                        votingReason: 'MEMBERSHIP'
                     },
                     {
                         address: '0x9876543210',
@@ -74,11 +69,29 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12),
                         endDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
                         initiator: '0x1234567890',
-                        votingType: 'APPLICATION'
+                        votingReason: 'APPLICATION'
                     }
                 ]
             })
 
         }
     },
+    addNewVoting: async (application, initiator, reason) => {
+        set(state => ({
+            votingList: [
+                {
+                    address: application.address,
+                    name: application.name,
+                    link: application.link,
+                    deposit: application.deposit,
+                    status: 'ACTIVE',
+                    startDate: new Date(),
+                    endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+                    initiator,
+                    votingReason: reason,
+                },
+                ...state.votingList,
+            ]
+        }))
+    }
 }))

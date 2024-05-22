@@ -14,15 +14,30 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {useApplicationStore} from "@/store/useApplicationStore.ts";
+import {errorToast, toast} from "@/components/ui/use-toast.ts";
+import {useVotingStore} from "@/store/useVotingStore.ts";
 
 interface IApplicationItemProps {
     application: IApplicationItem
+    address?: `0x${string}`
 }
 
-export const ApplicationItem = ({application}: IApplicationItemProps) => {
+export const ApplicationItem = ({application, address}: IApplicationItemProps) => {
+    const {challengeApplication} = useApplicationStore(state => ({
+        challengeApplication: state.challengeApplication
+    }));
+
+    const {addNewVoting} = useVotingStore(state => ({
+        addNewVoting: state.addNewVoting
+    }))
+
+
     const getStatus = () => {
         if (application.status === 'OPEN') {
             return 'Open application';
+        } else if (application.status === 'CHALLENGING') {
+            return 'Challenging application';
         } else {
             return 'Closed application';
         }
@@ -30,6 +45,8 @@ export const ApplicationItem = ({application}: IApplicationItemProps) => {
 
     const getStatusColor = () => {
         if (application.status === 'OPEN') {
+            return 'text-primary';
+        } else if (application.status === 'CHALLENGING') {
             return 'text-yellow-500';
         } else {
             return 'text-destructive';
@@ -37,15 +54,30 @@ export const ApplicationItem = ({application}: IApplicationItemProps) => {
     }
 
     const isDisabled = (v: IApplicationItem) => {
-        return v.status !== 'OPEN';
+        return v.status !== 'OPEN' || !address;
+    }
+
+    const sendChallenge = () => {
+        if (!address) {
+            return
+        }
+        // todo get deposit from initiator
+        challengeApplication(application).then(() => {
+            toast({
+                title: 'Success',
+                description: 'The challenge was successfully initialized',
+            })
+        }).then(() => addNewVoting(application, address, 'APPLICATION')).catch(() => {
+            errorToast('An error occurred while initializing the challenge')
+        })
     }
 
     return (
         <div className='flex flex-col w-full h-fit items-center px-4 pb-5 py-2 justify-between rounded-md border'>
-            <div className='flex flex-row justify-between w-full items-center mt-2 px-3'>
+            <div className='flex flex-row justify-between w-full items-center mt-2 px-3 gap-10'>
                 <div className='text-lg text-primary font-bold hover:underline underline-offset-4'>
                     <Link to={application.link} target='_blank'>
-                        <div className='flex items-center gap-3 text-md'>
+                        <div className='flex items-center gap-2 text-md'>
                             <p>{application.name}</p>
                             <LinkIcon className='w-4'/>
                         </div>
@@ -62,14 +94,13 @@ export const ApplicationItem = ({application}: IApplicationItemProps) => {
                 </div>
             </div>
             <div className='grid grid-cols-2 w-full items-center justify-center mt-8'>
-                <div className='grid grid-cols-2 gap-2'>
-
+                <div className='grid grid-cols-2 w-fit gap-2'>
                     <p>Deposit: </p>
                     <p>{stringifyBigInt(application.deposit)} TKN</p>
                     <p>Started at: </p>
-                    <p className='underline'>{application.startDate.toLocaleDateString()}</p>
+                    <p className='underline'>{application.endDate.toLocaleString()}</p>
                     <p>End at: </p>
-                    <p className='underline'>{application.endDate.toLocaleDateString()}</p>
+                    <p className='underline'>{application.endDate.toLocaleString()}</p>
                 </div>
                 <div className='flex flex-col gap-2 self-end'>
                     <AlertDialog>
@@ -89,7 +120,7 @@ export const ApplicationItem = ({application}: IApplicationItemProps) => {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction>Continue</AlertDialogAction>
+                                <AlertDialogAction onClick={sendChallenge}>Continue</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>

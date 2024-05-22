@@ -9,6 +9,7 @@ interface IApplicationStore {
                         name: string,
                         link: string,
                         deposit: bigint) => Promise<void>
+    challengeApplication: (application: IApplicationItem) => Promise<void>
 }
 
 export const useApplicationStore = create<IApplicationStore>((set, get) => ({
@@ -20,7 +21,7 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                 isLoaded: true,
                 applications: [
                     {
-                        address: '0x1234567890',
+                        address: '0x12345678901',
                         name: 'New amazing app 1',
                         link: 'https://github.com',
                         deposit: 100n * BigInt(1e18),
@@ -29,8 +30,17 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                         endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
                     },
                     {
-                        address: '0x12345678901',
+                        address: '0x12345678902',
                         name: 'New amazing app 2',
+                        link: 'https://github.com',
+                        deposit: 32n * BigInt(1e18),
+                        status: 'CHALLENGING',
+                        startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
+                        endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5),
+                    },
+                    {
+                        address: '0x12345678903',
+                        name: 'New amazing app 3',
                         link: 'https://github.com',
                         deposit: 100n * BigInt(1e18),
                         status: 'CLOSED',
@@ -55,6 +65,20 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                 },
                 ...state.applications,
             ]
+        }))
+    },
+    challengeApplication: async (application: IApplicationItem) => {
+        set(state => ({
+            applications: state.applications.map(a => {
+                if (a.address === application.address && a.startDate == application.startDate) {
+                    return {
+                        ...a,
+                        status: 'CHALLENGING',
+                        endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5)
+                    }
+                }
+                return a
+            })
         }))
     }
 }))

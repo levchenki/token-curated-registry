@@ -16,9 +16,9 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {useAccount} from "wagmi";
-import {useToast} from "@/components/ui/use-toast.ts";
+import {errorToast, toast} from "@/components/ui/use-toast.ts";
 import {useTokenStore} from "@/store/useTokenStore.ts";
-import {NumberToBigInt} from "@/utils/helpers.ts";
+import {isValidURL, NumberToBigInt} from "@/utils/helpers.ts";
 import {useVotingStore} from "@/store/useVotingStore.ts";
 import {useState} from "react";
 import {useApplicationStore} from "@/store/useApplicationStore.ts";
@@ -30,9 +30,8 @@ const addItemFormSchema = z.object({
     deposit: z.preprocess(n => Number(n), z.number().positive())
 })
 
-export const AddItemDialog = () => {
-    const {toast} = useToast()
-    const [open, setOpen] = useState(false)
+export const AddApplicationDialog = () => {
+    const [isOpen, setIsOpen] = useState(false)
     const {address} = useAccount()
     const {balance} = useTokenStore((state) => ({
         balance: state.balance
@@ -64,24 +63,29 @@ export const AddItemDialog = () => {
 
         values.address = address
 
+        if (isDuplicatedAddress(address)) {
+            errorToast('You\'re already have an application or item in this registry')
+            return
+        }
+
+
+        if (!isValidURL(values.link)) {
+            errorToast('Link is not valid')
+            return
+        }
+
+
         if (!isValid()) {
-            toast({
-                title: 'Error',
-                variant: 'destructive',
-                description: 'Inputs are not valid'
-            })
+            errorToast('Inputs are not valid')
             return
         }
 
         const convertedDeposit = NumberToBigInt(values.deposit)
         if (balance && balance < convertedDeposit) {
-            toast({
-                title: 'Error',
-                variant: 'destructive',
-                description: 'Deposit can\'t be greater than your balance'
-            })
+            errorToast('Deposit can\'t be greater than your balance')
             return
         }
+
 
         addNewApplication(address, values.name, values.link, convertedDeposit).then(() => {
             toast({
@@ -89,24 +93,25 @@ export const AddItemDialog = () => {
                 description: `Application sent from address ${address} for ${values.name} with deposit ${values.deposit} TKN`
             })
             resetForm()
-            setOpen(false)
+            setIsOpen(false)
         })
     }
 
     const isDuplicatedAddress = (address: string) => {
-        const isInVotingList = votingList.some((v) => {
-            return v.address === address && v.status !== 'DENIED';
+        const isInVotingList = votingList.find((v) => {
+            return v.address === address && v.status === 'ACTIVE'
         })
-        const isInApplicationList = applicationList.some((a) => {
-            return a.address === address && a.status !== 'OPEN';
+        const isInApplicationList = applicationList.find((a) => {
+            return a.address === address && a.status === 'OPEN'
         })
+
+        console.log(isInVotingList)
+        console.log(isInApplicationList)
         return isInVotingList || isInApplicationList
     }
 
     const isValid = () => {
         const {name, link, deposit} = addItemForm.getValues();
-
-        console.log(name.length > 0 && link.length > 0 && deposit > 0)
         return name.length > 0 && link.length > 0 && deposit > 0
     }
 
@@ -119,9 +124,9 @@ export const AddItemDialog = () => {
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button disabled={!address || (address && isDuplicatedAddress(address))}>
+                <Button disabled={!address}>
                     <UserRoundPlus/>
                 </Button>
             </DialogTrigger>
