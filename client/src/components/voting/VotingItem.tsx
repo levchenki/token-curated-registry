@@ -10,6 +10,7 @@ interface IVotingItemProps {
 }
 
 export const VotingItem = ({votingItem, address}: IVotingItemProps) => {
+
     const getStatus = () => {
         if (votingItem.status === 'ACTIVE') {
             return 'Active voting';
@@ -71,9 +72,12 @@ export const VotingItem = ({votingItem, address}: IVotingItemProps) => {
                     <p className='underline'>{votingItem.startDate.toLocaleString()}</p>
                     <p>End at: </p>
                     <p className='underline'>{votingItem.endDate.toLocaleString()}</p>
+                    <p>Votes: </p>
+                    <p>{votingItem.votesForObject.length + votingItem.votesForInitiator.length}</p>
                 </div>
                 <div className='flex flex-col gap-2 self-end'>
-                    <VotingDialogButton isDisabled={isDisabled(votingItem)} votingItem={votingItem}/>
+                    <VotingDialogButton isDisabled={isDisabled(votingItem)} address={address}
+                                        votingItem={votingItem}/>
                 </div>
             </div>
         </div>

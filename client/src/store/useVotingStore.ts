@@ -1,4 +1,4 @@
-import {IApplicationItem, IVotingItem, VotingReason} from "@/types/interfaces.ts";
+import {IApplicationItem, IVote, IVotingItem, VotingReason} from "@/types/interfaces.ts";
 import {create} from "zustand";
 
 interface IVotingStore {
@@ -6,6 +6,9 @@ interface IVotingStore {
     votingList: IVotingItem[],
     getVotingList: () => Promise<void>,
     addNewVoting: (application: IApplicationItem, initiator: `0x${string}`, reason: VotingReason) => Promise<void>
+    vote: (votingItem: IVotingItem,
+           isApproval: boolean,
+           voterAddress: `0x${string}`) => Promise<void>
 }
 
 export const useVotingStore = create<IVotingStore>((set, get) => ({
@@ -18,59 +21,43 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                 votingList: [
                     {
                         address: '0x1234567890',
-                        name: 'Voting 1',
+                        name: 'GyrosVPN',
                         link: 'https://github.com',
                         deposit: 100n * BigInt(1e18),
                         status: 'ACTIVE',
                         startDate: new Date(),
                         endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
                         initiator: '0x1234567890',
-                        votingReason: 'APPLICATION'
+                        votingReason: 'APPLICATION',
+                        votesForObject: [],
+                        votesForInitiator: [],
                     },
                     {
                         address: '0x0987654321',
-                        name: 'Voting 2',
-                        link: 'https://github.com',
+                        name: 'netch',
+                        link: 'https://github.com/netchx/netch',
                         deposit: 200n * BigInt(1e18),
                         status: 'APPROVED',
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14),
                         endDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
                         initiator: '0x1234567890',
-                        votingReason: 'MEMBERSHIP'
+                        votingReason: 'MEMBERSHIP',
+                        votesForObject: [],
+                        votesForInitiator: [],
                     },
                     {
                         address: '0x1357924680',
-                        name: 'Voting 3',
-                        link: 'https://github.com',
+                        name: 'shadowsocks',
+                        link: 'https://github.com/shadowsocks/shadowsocks-windows',
                         deposit: 300n * BigInt(1e18),
                         status: 'DENIED',
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14),
                         endDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
                         initiator: '0x1234567890',
-                        votingReason: 'APPLICATION'
+                        votingReason: 'APPLICATION',
+                        votesForObject: [],
+                        votesForInitiator: [],
                     },
-                    {
-                        address: '0x2468135790',
-                        name: 'Voting 4',
-                        link: 'https://github.com',
-                        deposit: 400n * BigInt(1e18),
-                        status: 'ACTIVE',
-                        startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6),
-                        endDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
-                        initiator: '0x1234567890',
-                        votingReason: 'MEMBERSHIP'
-                    },
-                    {
-                        address: '0x9876543210',
-                        name: 'Voting 5',
-                        link: 'https://github.com',
-                        deposit: 500n * BigInt(1e18),
-                        status: 'APPROVED',
-                        startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12),
-                        endDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
-                        initiator: '0x1234567890',
-                        votingReason: 'APPLICATION'
-                    }
                 ]
             })
 
@@ -85,6 +72,8 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                     link: application.link,
                     deposit: application.deposit,
                     status: 'ACTIVE',
+                    votesForObject: [],
+                    votesForInitiator: [],
                     startDate: new Date(),
                     endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
                     initiator,
@@ -93,5 +82,36 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                 ...state.votingList,
             ]
         }))
+    },
+    vote: async (votingItem,
+                 isApproval,
+                 voterAddress) => {
+
+        const vote: IVote = {voterAddress: voterAddress}
+
+        const votingList = get().votingList.map(v => {
+            if (v.address === votingItem.address) {
+
+                if (v.votesForObject.find(vote => vote.voterAddress === voterAddress)
+                    || v.votesForInitiator.find(vote => vote.voterAddress === voterAddress)) {
+                    throw new Error('You have already voted')
+                }
+
+                if (isApproval) {
+                    return {
+                        ...v,
+                        votesForInitiator: [...v.votesForInitiator, vote]
+                    }
+                } else {
+                    return {
+                        ...v,
+                        votesForObject: [...v.votesForObject, vote]
+                    }
+                }
+            }
+            return v
+        })
+
+        set({votingList})
     }
 }))

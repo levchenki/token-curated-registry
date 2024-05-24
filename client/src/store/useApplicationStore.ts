@@ -22,8 +22,8 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                 applications: [
                     {
                         address: '0x12345678901',
-                        name: 'New amazing app 1',
-                        link: 'https://github.com',
+                        name: 'MiniCPM-V',
+                        link: 'https://github.com/OpenBMB/MiniCPM-V',
                         deposit: 100n * BigInt(1e18),
                         status: 'OPEN',
                         startDate: new Date(),
@@ -31,8 +31,8 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                     },
                     {
                         address: '0x12345678902',
-                        name: 'New amazing app 2',
-                        link: 'https://github.com',
+                        name: 'netch',
+                        link: 'https://github.com/netchx/netch',
                         deposit: 32n * BigInt(1e18),
                         status: 'CHALLENGING',
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
@@ -40,8 +40,8 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                     },
                     {
                         address: '0x12345678903',
-                        name: 'New amazing app 3',
-                        link: 'https://github.com',
+                        name: 'shadowsocks',
+                        link: 'https://github.com/shadowsocks/shadowsocks-windows',
                         deposit: 100n * BigInt(1e18),
                         status: 'CLOSED',
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
