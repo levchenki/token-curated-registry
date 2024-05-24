@@ -7,6 +7,7 @@ import {getEtherscanAddressLink} from "@/utils/helpers.ts";
 
 interface RegistryItemProps {
     registry: IRegistryItem
+    address?: `0x${string}`
 }
 
 export const RegistryItem = ({registry}: RegistryItemProps) => {

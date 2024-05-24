@@ -2,21 +2,7 @@ import {IApplicationItem} from "@/types/interfaces.ts";
 import {Link} from "react-router-dom";
 import {ExternalLink, Link as LinkIcon} from "lucide-react";
 import {getEtherscanAddressLink, stringifyBigInt} from "@/utils/helpers.ts";
-import {Button} from "@/components/ui/button.tsx";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import {useApplicationStore} from "@/store/useApplicationStore.ts";
-import {errorToast, toast} from "@/components/ui/use-toast.ts";
-import {useVotingStore} from "@/store/useVotingStore.ts";
+import {ChallengeApplicationButton} from "@/components/application/ChallengeApplicationButton.tsx";
 
 interface IApplicationItemProps {
     application: IApplicationItem
@@ -24,14 +10,6 @@ interface IApplicationItemProps {
 }
 
 export const ApplicationItem = ({application, address}: IApplicationItemProps) => {
-    const {challengeApplication} = useApplicationStore(state => ({
-        challengeApplication: state.challengeApplication
-    }));
-
-    const {addNewVoting} = useVotingStore(state => ({
-        addNewVoting: state.addNewVoting
-    }))
-
 
     const getStatus = () => {
         if (application.status === 'OPEN') {
@@ -53,24 +31,6 @@ export const ApplicationItem = ({application, address}: IApplicationItemProps) =
         }
     }
 
-    const isDisabled = (v: IApplicationItem) => {
-        return v.status !== 'OPEN' || !address;
-    }
-
-    const sendChallenge = () => {
-        if (!address) {
-            return
-        }
-        // todo get deposit from initiator
-        challengeApplication(application).then(() => {
-            toast({
-                title: 'Success',
-                description: 'The challenge was successfully initialized',
-            })
-        }).then(() => addNewVoting(application, address, 'APPLICATION')).catch(() => {
-            errorToast('An error occurred while initializing the challenge')
-        })
-    }
 
     return (
         <div className='flex flex-col w-full h-fit items-center px-4 pb-5 py-2 justify-between rounded-md border'>
@@ -103,28 +63,9 @@ export const ApplicationItem = ({application, address}: IApplicationItemProps) =
                     <p className='underline'>{application.endDate.toLocaleString()}</p>
                 </div>
                 <div className='flex flex-col gap-2 self-end'>
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant='outline' disabled={isDisabled(application)}
-                                    size='sm'>
-                                Challenge
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This action cannot be undone. You will
-                                    spend {stringifyBigInt(application.deposit)} TKN to initialize the challenge.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={sendChallenge}>Continue</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-
+                    <ChallengeApplicationButton address={address} application={application}>
+                        Challenge
+                    </ChallengeApplicationButton>
                 </div>
             </div>
         </div>
