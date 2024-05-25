@@ -92,6 +92,9 @@ export const AddApplicationDialog = () => {
                 title: 'Success',
                 description: `Application sent from address ${address} for ${values.name} with deposit ${values.deposit} TKN`
             })
+        }).catch(() => {
+            errorToast('An error occurred while sending the application')
+        }).finally(() => {
             resetForm()
             setIsOpen(false)
         })
@@ -105,8 +108,6 @@ export const AddApplicationDialog = () => {
             return a.address === address && a.status === 'OPEN'
         })
 
-        console.log(isInVotingList)
-        console.log(isInApplicationList)
         return isInVotingList || isInApplicationList
     }
 

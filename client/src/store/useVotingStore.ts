@@ -1,11 +1,16 @@
-import {IApplicationItem, IVote, IVotingItem, VotingReason} from "@/types/interfaces.ts";
+import {IVote, IVotingItem, VotingReason} from "@/types/interfaces.ts";
 import {create} from "zustand";
 
 interface IVotingStore {
     isLoaded: boolean,
     votingList: IVotingItem[],
     getVotingList: () => Promise<void>,
-    addNewVoting: (application: IApplicationItem, initiator: `0x${string}`, reason: VotingReason) => Promise<void>
+    addNewVoting: (address: `0x${string}`,
+                   name: string,
+                   link: string,
+                   deposit: bigint,
+                   initiator: `0x${string}`,
+                   reason: VotingReason) => Promise<void>
     vote: (votingItem: IVotingItem,
            isApproval: boolean,
            voterAddress: `0x${string}`) => Promise<void>
@@ -46,6 +51,19 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                         votesForInitiator: [],
                     },
                     {
+                        address: '0x09813667654321',
+                        name: 'haoel.github.io',
+                        link: 'https://github.com/haoel/haoel.github.io',
+                        deposit: 200n * BigInt(1e18),
+                        status: 'ACTIVE',
+                        startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14),
+                        endDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
+                        initiator: '0x1234567890',
+                        votingReason: 'MEMBERSHIP',
+                        votesForObject: [],
+                        votesForInitiator: [],
+                    },
+                    {
                         address: '0x1357924680',
                         name: 'shadowsocks',
                         link: 'https://github.com/shadowsocks/shadowsocks-windows',
@@ -63,14 +81,19 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
 
         }
     },
-    addNewVoting: async (application, initiator, reason) => {
+    addNewVoting: async (address,
+                         name,
+                         link,
+                         deposit,
+                         initiator,
+                         reason) => {
         set(state => ({
             votingList: [
                 {
-                    address: application.address,
-                    name: application.name,
-                    link: application.link,
-                    deposit: application.deposit,
+                    address: address,
+                    name: name,
+                    link: link,
+                    deposit: deposit,
                     status: 'ACTIVE',
                     votesForObject: [],
                     votesForInitiator: [],

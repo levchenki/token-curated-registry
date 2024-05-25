@@ -1,4 +1,3 @@
-import {ReactNode} from "react";
 import {errorToast, toast} from "@/components/ui/use-toast.ts";
 import {Button} from "@/components/ui/button.tsx";
 import {IApplicationItem} from "@/types/interfaces.ts";
@@ -16,19 +15,24 @@ import {
     AlertDialogTrigger
 } from "@/components/ui/alert-dialog.tsx";
 import {stringifyBigInt} from "@/utils/helpers.ts";
+import {useTokenStore} from "@/store/useTokenStore.ts";
 
 interface IChallengeApplicationButtonProps {
-    children: ReactNode
     address?: `0x${string}`
     application: IApplicationItem
 }
 
 
 export const ChallengeApplicationButton = ({
-                                               children,
                                                address,
                                                application,
                                            }: IChallengeApplicationButtonProps) => {
+
+    const {balance, spend} = useTokenStore((state) => ({
+        balance: state.balance,
+        spend: state.spend
+    }))
+
 
     const {challengeApplication} = useApplicationStore(state => ({
         challengeApplication: state.challengeApplication
@@ -38,36 +42,48 @@ export const ChallengeApplicationButton = ({
         addNewVoting: state.addNewVoting
     }))
 
-    const isDisabled = (v?: IApplicationItem) => {
-        if (!v) {
-            return true
-        }
-        return v.status !== 'OPEN' || !address;
+    const isDisabled = (a: IApplicationItem) => {
+        return a.status !== 'OPEN' || !address;
     }
 
 
     const sendChallenge = () => {
-        if (!address || !application) {
+        if (!address) {
             return
         }
-        // todo get deposit from initiator
-        challengeApplication(application).then(() => {
-            toast({
-                title: 'Success',
-                description: 'The challenge was successfully initialized',
-            })
-        }).then(() => addNewVoting(application, address, 'APPLICATION')).catch(() => {
-            errorToast('An error occurred while initializing the challenge')
-        })
-    }
 
+        if (balance && application.deposit > balance) {
+            errorToast('Not enough balance')
+            return
+        }
+
+        spend(application.deposit)
+            .then(() => challengeApplication(application))
+            .then(() => addNewVoting(application.address,
+                application.name,
+                application.link,
+                application.deposit,
+                address,
+                'APPLICATION'))
+            .then(() => {
+                toast({
+                    title: 'Success',
+                    description: 'The challenge was successfully initialized',
+                })
+            })
+            .catch(() => {
+                errorToast('An error occurred while initializing the challenge')
+            })
+    }
 
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
                 <Button variant='outline' disabled={isDisabled(application)}
-                        size='sm'>
-                    {children}
+                        size='sm'
+                        className={isDisabled(application) ? 'text-yellow-500' : ''}
+                >
+                    {isDisabled(application) ? 'Challenging' : 'Challenge'}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>

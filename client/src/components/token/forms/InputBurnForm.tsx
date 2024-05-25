@@ -17,6 +17,7 @@ import {useToast} from "@/components/ui/use-toast.ts";
 import {ChangeEvent, useState} from "react";
 import {NumberToBigInt, stringifyBigInt} from "@/utils/helpers.ts";
 import {LoaderIcon} from "lucide-react";
+import {Badge} from "@/components/ui/badge.tsx";
 
 const burnFormSchema = z.object({
     burnedValue: z.preprocess(n => Number(n), z.number().positive().max(999999999999999))
@@ -120,7 +121,12 @@ export const InputBurnForm = ({disabled}: BurnTokensFormProps) => {
                     name='burnedValue'
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>To burn tokens</FormLabel>
+                            <FormLabel className='flex gap-2 items-center'>
+                                To burn tokens
+                                <Badge variant='outline'>
+                                    TKN to USDT
+                                </Badge>
+                            </FormLabel>
                             <div className='flex w-full max-w-sm items-center space-x-2'>
                                 <FormControl>
                                     <Input placeholder="TKN"

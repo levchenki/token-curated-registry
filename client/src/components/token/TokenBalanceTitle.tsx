@@ -2,7 +2,7 @@ import {LoaderIcon} from "lucide-react";
 import {stringifyBigInt} from "@/utils/helpers.ts";
 import {useTokenStore} from "@/store/useTokenStore.ts";
 import {useEffect} from "react";
-import {useToast} from "@/components/ui/use-toast.ts";
+import {errorToast} from "@/components/ui/use-toast.ts";
 
 
 interface TokenBalanceProps {
@@ -10,12 +10,10 @@ interface TokenBalanceProps {
 }
 
 export const TokenBalanceTitle = ({address,}: TokenBalanceProps) => {
-    const {toast} = useToast()
     const {
         balance,
         isFetchingBalance,
-        getBalance,
-        listenBalance,
+        getBalance
     } = useTokenStore(state => ({
         balance: state.balance,
         isFetchingBalance: state.isFetchingBalance,
@@ -26,27 +24,11 @@ export const TokenBalanceTitle = ({address,}: TokenBalanceProps) => {
 
     useEffect(() => {
         getBalance(address).catch(e => {
-            toast({
-                title: 'Error',
-                description: e.message,
-            })
+            errorToast(e.message)
             console.log(e)
         })
-    }, [toast, address, getBalance])
+    }, [address, getBalance])
 
-
-    useEffect(() => {
-        if (!address) {
-            return
-        }
-        listenBalance(address)
-            .catch(e => {
-                toast({
-                    title: 'Error',
-                    description: e.message,
-                })
-            })
-    }, [toast, address, listenBalance])
 
     return (
         <h2 className='text-xl font-semibold'>

@@ -17,6 +17,7 @@ import {useToast} from "@/components/ui/use-toast.ts";
 import {ChangeEvent, useState} from "react";
 import {NumberToBigInt, stringifyBigInt} from "@/utils/helpers.ts";
 import {LoaderIcon} from "lucide-react";
+import {Badge} from "@/components/ui/badge.tsx";
 
 const mintFormSchema = z.object({
     mintedValue: z.preprocess(n => Number(n), z.number().positive().max(999999999999999))
@@ -101,7 +102,12 @@ export const InputMintForm = ({disabled}: MintTokensFormProps) => {
                     name='mintedValue'
                     render={({field}) => (
                         <FormItem>
-                            <FormLabel>To mint tokens</FormLabel>
+                            <FormLabel className='flex gap-2 items-center'>
+                                To mint tokens
+                                <Badge variant='outline'>
+                                    USDT to TKN
+                                </Badge>
+                            </FormLabel>
                             <div className='flex w-full max-w-sm items-center space-x-2'>
                                 <FormControl>
                                     <Input placeholder="USDT"

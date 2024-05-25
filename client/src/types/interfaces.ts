@@ -9,10 +9,14 @@ export interface IDepositEvent extends IEvent {
 }
 
 
+export type RegistryItemStatus = 'ACTIVE' | 'CHALLENGING'
+
 export interface IRegistryItem {
     address: `0x${string}`
     name: string
-    link: string
+    link: string,
+    addedDate: Date
+    status: RegistryItemStatus
 }
 
 

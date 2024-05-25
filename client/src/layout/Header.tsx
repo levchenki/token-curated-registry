@@ -32,7 +32,7 @@ export const Header = () => {
                     </Button>
                 </Link>
             </div>
-            <div className='flex md:justify-end justify-center gap-5'>
+            <div className='flex md:justify-end items-center justify-center gap-5'>
                 <ShowTokenButton/>
                 <ConnectButton/>
                 <ModeToggle/>

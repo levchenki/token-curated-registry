@@ -18,6 +18,8 @@ interface BalanceStore {
     distribute: (from: `0x${string}` | undefined, isActive: boolean | undefined) => Promise<void>
     mint: (amount: bigint) => Promise<void>
 
+    spend: (amount: bigint) => Promise<void>
+
     getMintReward: (amount: bigint) => Promise<bigint>
     getBurnRefund: (amount: bigint) => Promise<bigint>
 
@@ -55,6 +57,18 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
                 const balanceOf = await tokenContract.read.balanceOf([address])
 
                 set({balance: BigInt(balanceOf), isFetchingBalance: false})
+            },
+
+            spend: async (amount: bigint) => {
+                const tokenContract = $tokenContract.peek()
+                const account = $account.peek()
+                const chain = $chain.peek()
+
+                if (!account) {
+                    return
+                }
+
+                await tokenContract.write.transfer([tokenContract.address, amount], {account: account.address, chain})
             },
 
             burn: async (amount: bigint) => {

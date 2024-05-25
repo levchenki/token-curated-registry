@@ -29,11 +29,12 @@ export const VotingDialogButton = ({isDisabled, votingItem, address}: IVotingDia
     const {vote} = useVotingStore(state => ({
         vote: state.vote
     }))
-    const {balance} = useTokenStore((state) => ({
-        balance: state.balance
+    const {balance, spend} = useTokenStore((state) => ({
+        balance: state.balance,
+        spend: state.spend
     }))
 
-    const VOTE_COST = 5n * BigInt(1e18)
+    const VOTE_COST = 15n * BigInt(1e18)
 
     const descriptionMessage = votingItem.votingReason === 'APPLICATION'
         ? 'Are you voting to approve or reject this application?'
@@ -48,15 +49,16 @@ export const VotingDialogButton = ({isDisabled, votingItem, address}: IVotingDia
             return
         }
 
-        vote(votingItem, isApproval, address).then(() => {
-            toast({
-                title: 'Success',
-                description: 'Your vote has been accepted',
+        spend(VOTE_COST)
+            .then(() => vote(votingItem, isApproval, address))
+            .then(() => {
+                toast({
+                    title: 'Success',
+                    description: 'Your vote has been accepted',
+                })
+                setIsOpen(false)
             })
-            setIsOpen(false)
-        }).catch(e => {
-            errorToast(e.message)
-        })
+            .catch(e => errorToast(e.message))
     }
 
     useEffect(() => {

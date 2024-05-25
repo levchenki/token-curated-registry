@@ -63,9 +63,7 @@ export const ApplicationItem = ({application, address}: IApplicationItemProps) =
                     <p className='underline'>{application.endDate.toLocaleString()}</p>
                 </div>
                 <div className='flex flex-col gap-2 self-end'>
-                    <ChallengeApplicationButton address={address} application={application}>
-                        Challenge
-                    </ChallengeApplicationButton>
+                    <ChallengeApplicationButton address={address} application={application}/>
                 </div>
             </div>
         </div>
