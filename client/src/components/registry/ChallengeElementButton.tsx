@@ -111,9 +111,9 @@ export const ChallengeElementButton = ({
                 <Button variant='outline'
                         disabled={isDisabled(registryItem)}
                         size='sm'
-                        className={isDisabled(registryItem) ? 'text-yellow-500' : ''}
+                        className={registryItem.status !== 'ACTIVE' ? 'text-yellow-500' : ''}
                 >
-                    {isDisabled(registryItem) ? 'Challenging' : 'Challenge'}
+                    {registryItem.status !== 'ACTIVE' ? 'Challenging' : 'Challenge'}
                 </Button>
             </DialogTrigger>
             <DialogContent>

@@ -81,9 +81,11 @@ export const ChallengeApplicationButton = ({
             <AlertDialogTrigger asChild>
                 <Button variant='outline' disabled={isDisabled(application)}
                         size='sm'
-                        className={isDisabled(application) ? 'text-yellow-500' : ''}
+                        className={application.status === 'CHALLENGING' ? 'text-yellow-500' : ''}
                 >
-                    {isDisabled(application) ? 'Challenging' : 'Challenge'}
+                    {application.status === 'CHALLENGING'
+                        ? 'Challenging'
+                        : application.status === 'OPEN' ? 'Challenge' : 'Challenged'}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>

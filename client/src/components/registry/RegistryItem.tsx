@@ -33,7 +33,10 @@ export const RegistryItem = ({registry, address}: RegistryItemProps) => {
                     </Link>
                 </Badge>
             </div>
-            <div className='grid grid-cols-2 w-full gap-10 items-center justify-center mt-8'>
+            <div className='flex mt-4'>
+                {registry.description}
+            </div>
+            <div className='grid grid-cols-2 w-full gap-10 items-center justify-center mt-4'>
                 <div className='grid grid-cols-2 w-full gap-2'>
                     <p>Owner: </p>
                     <p className='underline'>

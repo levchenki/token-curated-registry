@@ -17,6 +17,7 @@ export interface IRegistryItem {
     link: string,
     addedDate: Date
     status: RegistryItemStatus
+    description?: string
 }
 
 
@@ -30,6 +31,7 @@ export interface IApplicationItem {
     startDate: Date,
     endDate: Date,
     status: ApplicationStatus
+    description?: string
 }
 
 export type VotingStatus = 'ACTIVE' | 'APPROVED' | 'DENIED'
@@ -51,4 +53,5 @@ export interface IVotingItem {
     votingReason: VotingReason,
     votesForInitiator: IVote[],
     votesForObject: IVote[],
+    description?: string
 }

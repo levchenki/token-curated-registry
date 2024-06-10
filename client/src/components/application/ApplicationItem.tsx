@@ -53,7 +53,10 @@ export const ApplicationItem = ({application, address}: IApplicationItemProps) =
                     </Link>
                 </div>
             </div>
-            <div className='grid grid-cols-2 w-full items-center justify-center mt-8'>
+            <div className='flex mt-4'>
+                {application.description}
+            </div>
+            <div className='grid grid-cols-2 w-full items-center justify-center mt-4'>
                 <div className='grid grid-cols-2 w-fit gap-2'>
                     <p>Deposit: </p>
                     <p>{stringifyBigInt(application.deposit)} TKN</p>

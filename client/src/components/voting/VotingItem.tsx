@@ -56,7 +56,10 @@ export const VotingItem = ({votingItem, address}: IVotingItemProps) => {
                     </Link>
                 </div>
             </div>
-            <div className='grid grid-cols-2 w-full items-center justify-center mt-8'>
+            <div className='flex mt-4'>
+                {votingItem.description}
+            </div>
+            <div className='grid grid-cols-2 w-full items-center justify-center mt-4'>
                 <div className='grid grid-cols-2 w-fit gap-2'>
                     <p>Initiator: </p>
                     <p className='underline'>

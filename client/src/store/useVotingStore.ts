@@ -49,6 +49,7 @@ export const useVotingStore = create<IVotingStore>((set, get) => ({
                         votingReason: 'MEMBERSHIP',
                         votesForObject: [],
                         votesForInitiator: [],
+                        description: 'Netch is an open-source game accelerator and proxy designed for Windows, offering features like speed optimization, traffic compression, and proxy support.'
                     },
                     {
                         address: '0x09813667654321',

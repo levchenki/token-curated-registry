@@ -8,7 +8,8 @@ interface IApplicationStore {
     addNewApplication: (address: `0x${string}`,
                         name: string,
                         link: string,
-                        deposit: bigint) => Promise<void>
+                        deposit: bigint,
+                        description?: string) => Promise<void>
     challengeApplication: (application: IApplicationItem) => Promise<void>
 }
 
@@ -28,6 +29,7 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                         status: 'OPEN',
                         startDate: new Date(),
                         endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+                        description: 'MiniCPM-V is a lightweight and efficient CP/M operating system emulator for Windows, designed to run classic CP/M programs and games.'
                     },
                     {
                         address: '0x12345678902',
@@ -37,6 +39,7 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                         status: 'CHALLENGING',
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
                         endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 5),
+                        description: 'Netch is an open-source game accelerator and proxy designed for Windows, offering features like speed optimization, traffic compression, and proxy support.'
                     },
                     {
                         address: '0x12345678903',
@@ -46,12 +49,13 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                         status: 'CLOSED',
                         startDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
                         endDate: new Date(),
+                        description: 'Shadowsocks for Windows is a secure socks5 proxy that can be used to bypass network censorship and access restricted online content.'
                     },
                 ]
             })
         }
     },
-    addNewApplication: async (address, name, link, deposit) => {
+    addNewApplication: async (address, name, link, deposit, description) => {
         set(state => ({
             applications: [
                 {
@@ -59,6 +63,7 @@ export const useApplicationStore = create<IApplicationStore>((set, get) => ({
                     name,
                     link,
                     deposit,
+                    description,
                     startDate: new Date(),
                     endDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
                     status: 'OPEN'

@@ -27,6 +27,7 @@ const addItemFormSchema = z.object({
     address: z.string().optional(),
     name: z.string().min(1),
     link: z.string().min(1),
+    description: z.string().optional(),
     deposit: z.preprocess(n => Number(n), z.number().positive())
 })
 
@@ -52,7 +53,8 @@ export const AddApplicationDialog = () => {
             address: address,
             name: '',
             link: '',
-            deposit: 0
+            deposit: 0,
+            description: ''
         }
     })
 
@@ -87,7 +89,7 @@ export const AddApplicationDialog = () => {
         }
 
 
-        addNewApplication(address, values.name, values.link, convertedDeposit).then(() => {
+        addNewApplication(address, values.name, values.link, convertedDeposit, values.description).then(() => {
             toast({
                 title: 'Success',
                 description: `Application sent from address ${address} for ${values.name} with deposit ${values.deposit} TKN`
@@ -120,7 +122,8 @@ export const AddApplicationDialog = () => {
         addItemForm.reset({
             name: '',
             link: '',
-            deposit: 0
+            deposit: 0,
+            description: ''
         })
     }
 
@@ -180,6 +183,20 @@ export const AddApplicationDialog = () => {
                                                 <FormLabel>Github link</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="Link"
+                                                           {...field}/>
+                                                </FormControl>
+                                                <FormMessage/>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={addItemForm.control}
+                                        name='description'
+                                        render={({field}) => (
+                                            <FormItem>
+                                                <FormLabel>Description</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="Description"
                                                            {...field}/>
                                                 </FormControl>
                                                 <FormMessage/>
