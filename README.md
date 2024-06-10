@@ -16,7 +16,7 @@ Program for curating the registry of GitHub applications. The registry contains 
 1. Install [MetaMask](https://metamask.io/) plugin into your browser
 2. Download the repository
     ```bash
-    git clone https://github.com/levchenki/AirportsSearch/blame/main/README.md
+    git clone https://github.com/levchenki/token-curated-registry
     cd client
     ```
    
