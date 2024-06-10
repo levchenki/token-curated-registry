@@ -43,7 +43,7 @@ export const ChallengeApplicationButton = ({
     }))
 
     const isDisabled = (a: IApplicationItem) => {
-        return a.status !== 'OPEN' || !address;
+        return a.status !== 'OPEN' || !address || a.address === address;
     }
 
 

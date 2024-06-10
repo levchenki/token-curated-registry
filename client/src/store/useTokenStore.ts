@@ -232,7 +232,7 @@ export const useTokenStore = createWithEqualityFn<BalanceStore>()(
             partialize: (state) =>
                 Object.fromEntries(
                     Object.entries(state).filter(([key]) => {
-                        return !['balance', 'isListeningBalance', 'deposits', 'isListeningDeposits', 'isMinting', 'isBurning'].includes(key);
+                        return !['balance', 'isListeningBalance', 'deposits', 'isListeningDeposits',].includes(key);
                     }),
                 ),
         }

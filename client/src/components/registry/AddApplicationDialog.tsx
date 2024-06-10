@@ -34,8 +34,9 @@ const addItemFormSchema = z.object({
 export const AddApplicationDialog = () => {
     const [isOpen, setIsOpen] = useState(false)
     const {address} = useAccount()
-    const {balance} = useTokenStore((state) => ({
-        balance: state.balance
+    const {balance, spend} = useTokenStore((state) => ({
+        balance: state.balance,
+        spend: state.spend
     }))
 
     const {votingList} = useVotingStore(state => ({
@@ -88,13 +89,14 @@ export const AddApplicationDialog = () => {
             return
         }
 
-
-        addNewApplication(address, values.name, values.link, convertedDeposit, values.description).then(() => {
-            toast({
-                title: 'Success',
-                description: `Application sent from address ${address} for ${values.name} with deposit ${values.deposit} TKN`
-            })
-        }).catch(() => {
+        spend(convertedDeposit)
+            .then(() => addNewApplication(address, values.name, values.link, convertedDeposit, values.description))
+            .then(() => {
+                toast({
+                    title: 'Success',
+                    description: `Application sent from address ${address} for ${values.name} with deposit ${values.deposit} TKN`
+                })
+            }).catch(() => {
             errorToast('An error occurred while sending the application')
         }).finally(() => {
             resetForm()

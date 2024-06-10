@@ -13,7 +13,7 @@ interface RegistryItemProps {
 
 export const RegistryItem = ({registry, address}: RegistryItemProps) => {
     return (
-        <div className='flex flex-col w-5/6 h-fit items-center px-4 pb-5 py-2 justify-between rounded-md border'>
+        <div className='flex flex-col w-5/6 h-60 items-center px-4 pb-5 py-2 justify-between rounded-md border'>
             <div className='flex flex-row justify-between w-full items-center mt-2 px-3 gap-10'>
                 <div className='text-lg text-primary font-bold hover:underline underline-offset-4'>
                     <Link to={registry.link} target='_blank'>

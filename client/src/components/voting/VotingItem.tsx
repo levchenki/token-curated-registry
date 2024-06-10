@@ -56,8 +56,10 @@ export const VotingItem = ({votingItem, address}: IVotingItemProps) => {
                     </Link>
                 </div>
             </div>
-            <div className='flex mt-4'>
-                {votingItem.description}
+            <div className='flex mt-4 w-full'>
+                <p className='justify-self-start'>
+                    {votingItem.description}
+                </p>
             </div>
             <div className='grid grid-cols-2 w-full items-center justify-center mt-4'>
                 <div className='grid grid-cols-2 w-fit gap-2'>
