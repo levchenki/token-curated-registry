@@ -25,5 +25,3 @@ Program for curating the registry of GitHub applications. The registry contains 
         npm run dev
         npm i
     ```
-
-### [YouTube video](https://www.youtube.com/watch?v=GmUYSORGbOI&feature=youtu.be)
